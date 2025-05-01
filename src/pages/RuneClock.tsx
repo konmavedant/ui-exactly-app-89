@@ -131,11 +131,9 @@ const RuneClock: React.FC = () => {
           onClick={() => navigate('/settings')}
           className="w-8 h-8"
         >
-          <img 
-            src="/lovable-uploads/77360373-aaa6-447e-8255-80e4eadd17a1.png" 
-            alt="Menu Icon" 
-            className="w-full h-full"
-          />
+          <div className="w-8 h-0.5 bg-white mb-2"></div>
+          <div className="w-8 h-0.5 bg-white mb-2"></div>
+          <div className="w-8 h-0.5 bg-white"></div>
         </button>
         <h1 className="text-3xl md:text-4xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
         <div className="w-8"></div>
