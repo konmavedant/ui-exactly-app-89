@@ -36,11 +36,35 @@ const getZodiacSign = (date: Date): string => {
 };
 
 const RuneClock: React.FC = () => {
-  const { state } = useLocation() as { state: LocationState };
+  const location = useLocation();
+  const latestState = location.state as LocationState;
   
   const [currentTime, setCurrentTime] = useState<string>("");
-  const [location_, setLocation] = useState<string>(state?.placeOfBirth?.split(',')[0] || "Chicago");
-  const [country, setCountry] = useState<string>(state?.placeOfBirth?.split(',')[1]?.trim() || "United States");
+  const [location_, setLocation] = useState<string>(latestState?.placeOfBirth?.split(',')[0] || "Chicago");
+  const [country, setCountry] = useState<string>(latestState?.placeOfBirth?.split(',')[1]?.trim() || "United States");
+
+  useEffect(() => {
+    if (latestState?.placeOfBirth) {
+      const [city, countryPart] = latestState.placeOfBirth.split(',');
+      setLocation(city);
+      setCountry(countryPart?.trim() || country);
+      
+      // Update timezone based on new location
+      try {
+        const timezones = getTimeZones();
+        const matchingTimezone = timezones.find(tz => 
+          tz.mainCities.some(tzCity => 
+            tzCity.toLowerCase().includes(city.toLowerCase())
+          )
+        );
+        if (matchingTimezone) {
+          setTimezone(matchingTimezone.name);
+        }
+      } catch (error) {
+        console.error('Error updating timezone:', error);
+      }
+    }
+  }, [latestState]);
   const [zodiacSign, setZodiacSign] = useState<string>(() => 
     state?.dateOfBirth ? getZodiacSign(new Date(state.dateOfBirth)) : "Scorpio"
   );

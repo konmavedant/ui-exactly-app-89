@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20]">
@@ -26,7 +27,7 @@ const Settings: React.FC = () => {
                 <span className="text-2xl text-gray-400">👤</span>
               </div>
             </Avatar>
-            <div className="text-xl font-medium">Vedant Jha</div>
+            <div className="text-xl font-medium">{state?.fullName || "Guest User"}</div>
           </div>
         </div>
 

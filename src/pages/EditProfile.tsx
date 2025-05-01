@@ -11,12 +11,19 @@ import { cn } from "@/lib/utils";
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("Vedant Jha");
-  const [date, setDate] = useState<Date>(new Date('2002-01-01'));
-  const [placeOfBirth, setPlaceOfBirth] = useState("Mumbai, India");
+  const { state } = useLocation();
+  const [fullName, setFullName] = useState(state?.fullName || "");
+  const [date, setDate] = useState<Date>(state?.dateOfBirth ? new Date(state.dateOfBirth) : new Date());
+  const [placeOfBirth, setPlaceOfBirth] = useState(state?.placeOfBirth || "");
 
   const handleSave = () => {
-    navigate('/settings');
+    navigate('/rune-clock', {
+      state: {
+        fullName,
+        dateOfBirth: date,
+        placeOfBirth
+      }
+    });
   };
 
   return (
