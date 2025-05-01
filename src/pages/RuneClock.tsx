@@ -42,7 +42,6 @@ const RuneClock: React.FC = () => {
   // Calculate rotation angles for clock hands
   const hourRotation = (hours % 12) * 30 + minutes * 0.5; // 30 degrees per hour, plus small adjustment for minutes
   const minuteRotation = minutes * 6; // 6 degrees per minute
-  const secondRotation = seconds * 6; // 6 degrees per second
   
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
@@ -75,8 +74,7 @@ const RuneClock: React.FC = () => {
             <img 
               src={hourHandImage} 
               alt="Hour Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[92%] w-[38%] h-auto"
-              style={{ transformOrigin: 'center bottom' }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-[45%] w-auto origin-center"
             />
           </div>
           
@@ -88,13 +86,9 @@ const RuneClock: React.FC = () => {
             <img 
               src={minuteHandImage} 
               alt="Minute Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[85%] w-[32%] h-auto"
-              style={{ transformOrigin: 'center bottom' }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-[55%] w-auto origin-center"
             />
           </div>
-          
-          {/* Center Point */}
-          <div className="absolute top-1/2 left-1/2 w-5 h-5 bg-[#00B0DF] rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
         </div>
       </div>
       
