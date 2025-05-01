@@ -1,0 +1,68 @@
+import React from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const AppInfoPage = () => {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Yellow header */}
+      <div className="bg-[#FFFC00] px-6 pt-12 pb-4">
+        <div className="flex items-center gap-4">
+          <Link to="/settings" className="text-black">
+            <ArrowLeft size={24} strokeWidth={2.5} />
+          </Link>
+          <h1 className="text-3xl font-bold text-black">App Info</h1>
+        </div>
+      </div>
+
+      {/* White content */}
+      <div className="flex-1 bg-white rounded-t-3xl -mt-2 p-6 overflow-auto">
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-[#FFFC00]">About Rune Clock</h2>
+          
+          <p className="text-lg text-gray-700">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. 
+            Sed vitae lorem eget odio tincidunt suscipit. Curabitur auctor, neque id 
+            sodales vehicula, erat purus imperdiet turpis, at vestibulum arcu metus at justo. 
+            Fusce vel risus non purus dictum fermentum. Vestibulum euismod, lorem ut venenatis 
+            feugiat, nunc justo dignissim neque, et dapibus purus augue a neque. Integer volutpat 
+            ex a nulla bibendum tincidunt.
+          </p>
+
+          <h2 className="text-3xl font-bold text-[#FFFC00]">Zodiac Signs</h2>
+
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <span className="text-xl font-bold">1.</span>
+                <h3 className="text-xl font-bold">Lorem Ipsum Point 1</h3>
+              </div>
+              <p className="text-lg pl-8 text-gray-700">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. 
+                Sed vitae lorem eget odio tincidunt suscipit.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <span className="text-xl font-bold">2.</span>
+                <h3 className="text-xl font-bold">Lorem Ipsum Point 2</h3>
+              </div>
+              <p className="text-lg pl-8 text-gray-700">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. 
+                Sed vitae lorem eget odio tincidunt suscipit.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* iPhone-style bottom indicator */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-2 bg-white">
+        <div className="w-32 h-1 rounded-full bg-black opacity-20"></div>
+      </div>
+    </div>
+  );
+};
+
+export default AppInfoPage;

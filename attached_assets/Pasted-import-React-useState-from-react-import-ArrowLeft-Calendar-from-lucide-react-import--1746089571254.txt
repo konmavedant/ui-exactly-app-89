@@ -1,0 +1,104 @@
+import React, { useState } from 'react';
+import { ArrowLeft, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Avatar } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+
+const EditProfilePage = () => {
+  const [name, setName] = useState('Lorem Ipsum');
+  const [date, setDate] = useState<Date>(new Date('2002-01-01'));
+  const [birthplace, setBirthplace] = useState('Chicago, United States');
+  
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Yellow header */}
+      <div className="bg-[#FFFC00] px-6 pt-12 pb-4">
+        <div className="flex items-center gap-4">
+          <Link to="/settings" className="text-black">
+            <ArrowLeft size={24} strokeWidth={2.5} />
+          </Link>
+          <h1 className="text-3xl font-bold text-black">Edit Profile</h1>
+        </div>
+      </div>
+
+      {/* White content with profile avatar overlapping */}
+      <div className="flex-1 bg-white rounded-t-3xl -mt-2 pt-24 px-6 relative">
+        {/* Avatar */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-20">
+          <Avatar className="h-40 w-40 border-4 border-white">
+            <div className="bg-gray-200 h-full w-full flex items-center justify-center">
+              <span className="text-6xl text-gray-400">👤</span>
+            </div>
+          </Avatar>
+          <div className="text-center mt-2">
+            <span className="text-lg">Change Picture</span>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="fullName" className="block text-2xl font-semibold">Full Name</label>
+            <Input 
+              id="fullName" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              className="text-xl p-4 h-14" 
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="block text-2xl font-semibold">DOB</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between text-xl p-4 h-14 font-normal"
+                >
+                  {format(date, "dd MMM yyyy")}
+                  <Calendar className="h-6 w-6" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={date}
+                  onSelect={(date) => date && setDate(date)}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          <div className="space-y-2">
+            <label htmlFor="birthplace" className="block text-2xl font-semibold">Place of Birth</label>
+            <Input 
+              id="birthplace" 
+              value={birthplace} 
+              onChange={(e) => setBirthplace(e.target.value)} 
+              className="text-xl p-4 h-14" 
+            />
+          </div>
+          
+          <Button 
+            className="w-full bg-[#FFFC00] text-black hover:bg-[#FFEB33] py-6 text-xl font-bold mt-8"
+          >
+            Update
+          </Button>
+        </div>
+      </div>
+      
+      {/* iPhone-style bottom indicator */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-2 bg-white">
+        <div className="w-32 h-1 rounded-full bg-black opacity-20"></div>
+      </div>
+    </div>
+  );
+};
+
+export default EditProfilePage;
