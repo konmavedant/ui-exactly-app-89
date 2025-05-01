@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -90,7 +89,7 @@ const RuneClock: React.FC = () => {
               <img 
                 src={minuteHandImage} 
                 alt="Minute Hand" 
-                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[12%]"
+                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[20%]"
                 style={{ transformOrigin: 'center 50%' }}
               />
             </div>
