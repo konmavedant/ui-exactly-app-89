@@ -43,10 +43,10 @@ const RuneClock: React.FC = () => {
         const response = await axios.get(`https://api.timezonedb.com/v2.1/searchCity?key=0CT7UWY8ACJO&q=${event.target.value}&format=json`);
         if (response.data.status === 'OK' && response.data.zones.length > 0) {
           const cityData = response.data.zones[0];
-          setLocation(cityData.cityName);
-          setCountry(cityData.countryName);
+          setLocation(cityData.cityName || event.target.value);
+          setCountry(cityData.countryName || '');
           setTimezone(cityData.zoneName);
-          
+
           // Update zodiac sign based on current date
           const currentDate = new Date();
           const zodiacSigns = {
@@ -63,7 +63,7 @@ const RuneClock: React.FC = () => {
             'Aquarius': [120, 218],
             'Pisces': [219, 320]
           };
-          
+
           const monthDay = parseInt(format(currentDate, 'Mdd'));
           const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
             if (start > end) {
@@ -71,7 +71,7 @@ const RuneClock: React.FC = () => {
             }
             return monthDay >= start && monthDay <= end;
           });
-          
+
           setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
         }
       } catch (error) {
