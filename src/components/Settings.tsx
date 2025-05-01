@@ -2,7 +2,7 @@
 import React from "react";
 import { Avatar } from '@/components/ui/avatar';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
