@@ -90,7 +90,7 @@ const ProfileSetup: React.FC = () => {
             value={placeOfBirth}
             onChange={(e) => setPlaceOfBirth(e.target.value)}
             className="h-16 text-xl px-5 rounded-xl border border-gray-300"
-            placeholder="For eg.: Mumbai, India"
+            placeholder="For eg.: Mumbai, Asia"
           />
         </div>
 
