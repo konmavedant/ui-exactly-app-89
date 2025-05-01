@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,6 @@ import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getTimeZones } from '@vvo/tzdb';
-
 import { useLocation } from "react-router-dom";
 
 interface LocationState {
@@ -49,11 +49,10 @@ const RuneClock: React.FC = () => {
   const [timezone, setTimezone] = useState<string>("America/Chicago");
   const [searchInput, setSearchInput] = useState<string>("");
 
-  // Update time every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a'); // Use date-fns-tz for timezone support
+      const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a');
 
       setCurrentTime(formattedTime);
       setHours(now.getHours());
@@ -79,50 +78,49 @@ const RuneClock: React.FC = () => {
           tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
         );
 
-      if (matchingTimezone) {
-        const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
-        setLocation(cityName || searchValue);
-        setCountry(matchingTimezone.continentName);
-        setTimezone(matchingTimezone.name);
+        if (matchingTimezone) {
+          const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
+          setLocation(cityName || searchValue);
+          setCountry(matchingTimezone.continentName);
+          setTimezone(matchingTimezone.name);
 
-        // Update zodiac sign based on current date
-        const currentDate = new Date();
-        const zodiacSigns = {
-          'Aries': [321, 419],
-          'Taurus': [420, 520],
-          'Gemini': [521, 620],
-          'Cancer': [621, 722],
-          'Leo': [723, 822],
-          'Virgo': [823, 922],
-          'Libra': [923, 1022],
-          'Scorpio': [1023, 1121],
-          'Sagittarius': [1122, 1221],
-          'Capricorn': [1222, 119],
-          'Aquarius': [120, 218],
-          'Pisces': [219, 320]
-        };
+          const currentDate = new Date();
+          const monthDay = parseInt(format(currentDate, 'Mdd'));
+          const zodiacSigns = {
+            'Aries': [321, 419],
+            'Taurus': [420, 520],
+            'Gemini': [521, 620],
+            'Cancer': [621, 722],
+            'Leo': [723, 822],
+            'Virgo': [823, 922],
+            'Libra': [923, 1022],
+            'Scorpio': [1023, 1121],
+            'Sagittarius': [1122, 1221],
+            'Capricorn': [1222, 119],
+            'Aquarius': [120, 218],
+            'Pisces': [219, 320]
+          };
 
-        const monthDay = parseInt(format(currentDate, 'Mdd'));
-        const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
-          if (start > end) {
-            return monthDay >= start || monthDay <= end;
-          }
-          return monthDay >= start && monthDay <= end;
-        });
+          const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
+            if (start > end) {
+              return monthDay >= start || monthDay <= end;
+            }
+            return monthDay >= start && monthDay <= end;
+          });
 
-        setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
+          setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
+        }
+      } catch (error) {
+        console.error('Error fetching timezone data:', error);
       }
     }
   };
 
-
-  // Calculate rotation angles for clock hands
-  const hourRotation = (hours % 12) * 30 + minutes * 0.5; // 30 degrees per hour, plus small adjustment for minutes
-  const minuteRotation = minutes * 6; // 6 degrees per minute
+  const hourRotation = (hours % 12) * 30 + minutes * 0.5;
+  const minuteRotation = minutes * 6;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
-      {/* Header */}
       <header className="flex justify-between items-center p-6">
         <div className="w-8 h-8">
           <div className="w-8 h-0.5 bg-white mb-2"></div>
@@ -130,20 +128,17 @@ const RuneClock: React.FC = () => {
           <div className="w-8 h-0.5 bg-white"></div>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
-        <div className="w-8"></div> {/* Empty div for spacing */}
+        <div className="w-8"></div>
       </header>
 
-      {/* Clock Image and Hands */}
       <div className="flex-1 flex justify-center items-center my-4 px-4">
         <div className="relative w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]">
-          {/* Rune Clock Background */}
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
             className="w-full h-full"
           />
 
-          {/* Hour Hand */}
           <div 
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
             style={{ transform: `rotate(${hourRotation}deg)` }}
@@ -158,7 +153,6 @@ const RuneClock: React.FC = () => {
             </div>
           </div>
 
-          {/* Minute Hand */}
           <div 
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
             style={{ transform: `rotate(${minuteRotation}deg)` }}
@@ -175,9 +169,8 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      {/* Location & Time Info */}
       <div className="text-center px-6 py-6 space-y-5">
-        <h2 className="text-3xl md:text-4xl font-bold text-appYellow">{location}</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-appYellow">{location_}</h2>
         <h3 className="text-5xl md:text-6xl font-bold text-white">{currentTime}</h3>
         <p className="text-2xl md:text-3xl text-gray-400">{country}</p>
 
@@ -186,7 +179,6 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
       <div className="mt-auto px-6 pb-10 pt-6">
         <div className="relative flex items-center">
           <div className="absolute left-3">
