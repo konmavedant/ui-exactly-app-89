@@ -1,0 +1,31 @@
+The above error occurred in the <RuneClock> component:
+
+    at RuneClock (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/src/pages/RuneClock.tsx:39:22)
+    at RenderedRoute (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4069:5)
+    at Routes (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4508:5)
+    at Router (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4451:15)
+    at BrowserRouter (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:5196:5)
+    at Provider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/chunk-STCHXPES.js?v=4900e840:28:15)
+    at TooltipProvider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=4900e840:52:5)
+    at QueryClientProvider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=4900e840:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+at RuneClock (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/src/pages/RuneClock.tsx:39:22)
+at RenderedRoute (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4069:5)
+at Routes (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4508:5)
+at Router (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:4451:15)
+at BrowserRouter (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4900e840:5196:5)
+at Provider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/chunk-STCHXPES.js?v=4900e840:28:15)
+at TooltipProvider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=4900e840:52:5)
+at QueryClientProvider (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=4900e840:2794:3)
+at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+at t.value (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56t296bi3t.pike.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://9ee69db4-c28e-49be-bca8-ff85a34348f6-00-tu56
