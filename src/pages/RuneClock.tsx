@@ -90,7 +90,7 @@ const RuneClock: React.FC = () => {
               <img 
                 src={minuteHandImage} 
                 alt="Minute Hand" 
-                className="h-[55%] max-h-[270px] w-auto transform -translate-y-0"
+                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[5%]"
                 style={{ transformOrigin: 'center 50%' }}
               />
             </div>
