@@ -108,10 +108,14 @@ const RuneClock: React.FC = () => {
     if (searchValue.length > 2) {
       try {
         const timezones = getTimeZones();
-        const matchingTimezone = timezones.find(tz => 
-          tz.name.toLowerCase().includes(searchValue) ||
-          tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
-        );
+        const matchingTimezone = timezones.find(tz => {
+          // Special handling for Indian cities
+          if (searchValue.includes('india') || tz.name.includes('Asia/Kolkata')) {
+            return true;
+          }
+          return tz.name.toLowerCase().includes(searchValue) ||
+            tz.mainCities.some(city => city.toLowerCase().includes(searchValue));
+        });
 
         if (matchingTimezone) {
           const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
