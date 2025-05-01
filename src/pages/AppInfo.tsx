@@ -28,17 +28,17 @@ const AppInfo: React.FC = () => {
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4">Features</h2>
+            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4 text-left">Features</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-bold mb-2">Personalized Time Display</h3>
-                <p className="text-lg text-gray-700 pl-4">
+                <h3 className="text-xl font-bold mb-2 text-left">Personalized Time Display</h3>
+                <p className="text-lg text-gray-700 pl-4 text-left">
                   View time through a beautiful runic interface customized to your preferences and location.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Zodiac Integration</h3>
-                <p className="text-lg text-gray-700 pl-4">
+                <h3 className="text-xl font-bold mb-2 text-left">Zodiac Integration</h3>
+                <p className="text-lg text-gray-700 pl-4 text-left">
                   See how your zodiac sign influences your time perception and daily rhythms.
                 </p>
               </div>
@@ -46,7 +46,7 @@ const AppInfo: React.FC = () => {
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold text-[#FFFC00] mb-2">Version</h2>
+            <h2 className="text-xl font-bold text-[#FFFC00] mb-2">Version</h2>
             <p className="text-lg text-gray-700">1.0.0</p>
           </div>
         </div>

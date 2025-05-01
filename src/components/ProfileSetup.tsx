@@ -37,9 +37,6 @@ const ProfileSetup: React.FC = () => {
         <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-white">
           <div className="w-16 h-16 bg-white rounded-full mb-4"></div>
         </div>
-        <button className="mt-4 text-black text-xl font-medium">
-          Change Picture
-        </button>
       </div>
 
       {/* Form fields */}

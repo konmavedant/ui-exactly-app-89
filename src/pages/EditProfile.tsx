@@ -34,7 +34,7 @@ const EditProfile: React.FC = () => {
 
         <div className="space-y-6">
           <div>
-            <label htmlFor="fullName" className="block text-2xl font-bold mb-2 text-black">
+            <label htmlFor="fullName" className="block text-2xl font-bold mb-2 text-black text-left">
               Full Name
             </label>
             <Input
@@ -46,7 +46,7 @@ const EditProfile: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-2xl font-bold mb-2 text-black">
+            <label className="block text-2xl font-bold mb-2 text-black text-left">
               DOB
             </label>
             <Popover>
@@ -74,7 +74,7 @@ const EditProfile: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="placeOfBirth" className="block text-2xl font-bold mb-2 text-black">
+            <label htmlFor="placeOfBirth" className="block text-2xl font-bold mb-2 text-black text-left">
               Place of Birth
             </label>
             <Input
