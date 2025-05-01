@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -11,9 +10,9 @@ import { cn } from "@/lib/utils";
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("Lorem Ipsum");
+  const [fullName, setFullName] = useState("");
   const [date, setDate] = useState<Date>();
-  const [placeOfBirth, setPlaceOfBirth] = useState("Chicago, United States");
+  const [placeOfBirth, setPlaceOfBirth] = useState("");
 
   const handleProceed = () => {
     navigate('/rune-clock', { 
@@ -50,6 +49,7 @@ const ProfileSetup: React.FC = () => {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="h-16 text-xl px-5 rounded-xl border border-gray-300"
+            placeholder="Enter your full name"
           />
         </div>
 
@@ -90,6 +90,7 @@ const ProfileSetup: React.FC = () => {
             value={placeOfBirth}
             onChange={(e) => setPlaceOfBirth(e.target.value)}
             className="h-16 text-xl px-5 rounded-xl border border-gray-300"
+            placeholder="Enter your place of birth"
           />
         </div>
 
