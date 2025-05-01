@@ -26,7 +26,7 @@ const ProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#231F20] relative">
+    <div className="flex flex-col min-h-screen bg-white relative">
       {/* Yellow header */}
       <div className="bg-appYellow h-[180px] w-full rounded-b-[40px] flex items-start pt-12 px-8">
         <h1 className="text-4xl font-bold text-black">Get Started</h1>
