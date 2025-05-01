@@ -16,14 +16,33 @@ interface LocationState {
   placeOfBirth: string;
 }
 
+const getZodiacSign = (date: Date): string => {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+  return 'Pisces';
+};
+
 const RuneClock: React.FC = () => {
-  const location = useLocation();
-  const state = location.state as LocationState;
+  const { state } = useLocation() as { state: LocationState };
   
   const [currentTime, setCurrentTime] = useState<string>("");
   const [location_, setLocation] = useState<string>(state?.placeOfBirth?.split(',')[0] || "Chicago");
   const [country, setCountry] = useState<string>(state?.placeOfBirth?.split(',')[1]?.trim() || "United States");
-  const [zodiacSign, setZodiacSign] = useState<string>("Scorpio");
+  const [zodiacSign, setZodiacSign] = useState<string>(() => 
+    state?.dateOfBirth ? getZodiacSign(new Date(state.dateOfBirth)) : "Scorpio"
+  );
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(0);
@@ -53,11 +72,12 @@ const RuneClock: React.FC = () => {
     setSearchInput(searchValue);
 
     if (searchValue.length > 2) {
-      const timezones = getTimeZones();
-      const matchingTimezone = timezones.find(tz => 
-        tz.name.toLowerCase().includes(searchValue) ||
-        tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
-      );
+      try {
+        const timezones = getTimeZones();
+        const matchingTimezone = timezones.find(tz => 
+          tz.name.toLowerCase().includes(searchValue) ||
+          tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
+        );
 
       if (matchingTimezone) {
         const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
