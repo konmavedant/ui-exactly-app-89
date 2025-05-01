@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import RuneClock from "./pages/RuneClock";
 import NotFound from "./pages/NotFound";
+import Settings from "./components/Settings";
 import "./App.css";
 
 const queryClient = new QueryClient();
