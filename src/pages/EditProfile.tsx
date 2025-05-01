@@ -12,11 +12,10 @@ import { cn } from "@/lib/utils";
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("Vedant Jha");
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date>(new Date('2002-01-01'));
   const [placeOfBirth, setPlaceOfBirth] = useState("Mumbai, India");
 
   const handleSave = () => {
-    // Handle save logic here
     navigate('/settings');
   };
 
@@ -34,7 +33,7 @@ const EditProfile: React.FC = () => {
       <div className="flex-1 bg-white rounded-t-3xl -mt-2 px-6 py-8">
         <div className="flex flex-col items-center mb-8">
           <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-white">
-            <div className="w-16 h-16 bg-white rounded-full mb-4"></div>
+            <div className="text-6xl text-gray-400">👤</div>
           </div>
           <button className="mt-4 text-black text-xl font-medium">
             Change Picture
@@ -63,19 +62,19 @@ const EditProfile: React.FC = () => {
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "h-16 text-xl px-5 rounded-xl border border-gray-300 w-full justify-start text-left font-normal",
+                    "h-16 text-xl px-5 rounded-xl border border-gray-300 w-full justify-between text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  <CalendarIcon className="h-6 w-6" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(date) => date && setDate(date)}
                   initialFocus
                 />
               </PopoverContent>
@@ -96,7 +95,7 @@ const EditProfile: React.FC = () => {
 
           <Button 
             onClick={handleSave}
-            className="w-full h-16 text-2xl font-bold bg-appYellow hover:bg-appYellow/90 text-black rounded-xl mt-8"
+            className="w-full h-16 text-2xl font-bold bg-[#FFFC00] hover:bg-[#FFFC00]/90 text-black rounded-xl mt-8"
           >
             Save Changes
           </Button>

@@ -20,21 +20,34 @@ const AppInfo: React.FC = () => {
       <div className="flex-1 bg-white rounded-t-3xl -mt-2 px-6 py-8">
         <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Version</h2>
-            <p className="text-gray-600">1.0.0</p>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold mb-2">About</h2>
-            <p className="text-gray-600">
+            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4">About Rune Clock</h2>
+            <p className="text-lg text-gray-700">
               The Rune Clock app is a unique timepiece that combines traditional timekeeping with runic symbolism. 
               It provides personalized time experiences based on your birth details and location.
             </p>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold mb-2">Developer</h2>
-            <p className="text-gray-600">© 2024 Rune Clock Team</p>
+            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4">Features</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-bold mb-2">Personalized Time Display</h3>
+                <p className="text-lg text-gray-700 pl-4">
+                  View time through a beautiful runic interface customized to your preferences and location.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Zodiac Integration</h3>
+                <p className="text-lg text-gray-700 pl-4">
+                  See how your zodiac sign influences your time perception and daily rhythms.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-bold text-[#FFFC00] mb-2">Version</h2>
+            <p className="text-lg text-gray-700">1.0.0</p>
           </div>
         </div>
       </div>
