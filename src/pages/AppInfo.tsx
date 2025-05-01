@@ -13,15 +13,15 @@ const AppInfo: React.FC = () => {
           <button onClick={() => navigate(-1)} className="text-black">
             <ArrowLeft size={24} strokeWidth={2.5} />
           </button>
-          <h1 className="text-3xl font-bold text-black">App Info</h1>
+          <h1 className="text-3xl font-bold text-black text-left">App Info</h1>
         </div>
       </div>
 
       <div className="flex-1 bg-white rounded-t-3xl -mt-2 px-6 py-8">
         <div className="space-y-8">
           <div>
-            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4">About Rune Clock</h2>
-            <p className="text-lg text-gray-700">
+            <h2 className="text-3xl font-bold text-[#FFFC00] mb-4 text-left">About Rune Clock</h2>
+            <p className="text-lg text-gray-700 text-left">
               The Rune Clock app is a unique timepiece that combines traditional timekeeping with runic symbolism. 
               It provides personalized time experiences based on your birth details and location.
             </p>

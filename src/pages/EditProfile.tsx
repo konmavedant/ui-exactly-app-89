@@ -26,7 +26,7 @@ const EditProfile: React.FC = () => {
           <button onClick={() => navigate(-1)} className="text-black">
             <ArrowLeft size={24} strokeWidth={2.5} />
           </button>
-          <h1 className="text-3xl font-bold text-black">Edit Profile</h1>
+          <h1 className="text-3xl font-bold text-black text-left">Edit Profile</h1>
         </div>
       </div>
 
