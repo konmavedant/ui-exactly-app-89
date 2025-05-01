@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Search, Clock } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
-import hourHandImage from "/lovable-uploads/e7ca53e9-b8ae-45c3-8a75-0d6cf74a04b4.png";
-import minuteHandImage from "/lovable-uploads/7dc26502-9f57-44c5-ba9b-9b9890522f51.png";
+import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
+import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -68,26 +68,33 @@ const RuneClock: React.FC = () => {
           
           {/* Hour Hand */}
           <div 
-            className="absolute top-0 left-0 w-full h-full"
+            className="absolute top-0 left-0 w-full h-full pointer-events-none"
             style={{ transform: `rotate(${hourRotation}deg)` }}
           >
-            <div className="absolute top-1/2 left-1/2 w-[8%] h-[33%] bg-white rounded-t-md transform -translate-x-1/2 -translate-y-full origin-bottom">
-              {/* White hour hand styled to match reference image */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 origin-center">
+              <img 
+                src={hourHandImage} 
+                alt="Hour Hand" 
+                className="h-[45%] max-h-[220px] w-auto transform -translate-y-[3.5%]"
+                style={{ transformOrigin: 'center 58%' }}
+              />
             </div>
           </div>
           
           {/* Minute Hand */}
           <div 
-            className="absolute top-0 left-0 w-full h-full"
+            className="absolute top-0 left-0 w-full h-full pointer-events-none"
             style={{ transform: `rotate(${minuteRotation}deg)` }}
           >
-            <div className="absolute top-1/2 left-1/2 w-[4%] h-[43%] bg-white rounded-t-md transform -translate-x-1/2 -translate-y-full origin-bottom">
-              {/* White minute hand styled to match reference image */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 origin-center">
+              <img 
+                src={minuteHandImage} 
+                alt="Minute Hand" 
+                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[5%]"
+                style={{ transformOrigin: 'center 55%' }}
+              />
             </div>
           </div>
-          
-          {/* Center Point */}
-          <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-[#3498db] rounded-full transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
         </div>
       </div>
       
