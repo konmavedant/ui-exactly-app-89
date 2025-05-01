@@ -40,8 +40,16 @@ const RuneClock: React.FC = () => {
     setSearchInput(event.target.value);
     if (event.target.value.length > 2) {
       try {
-        const response = await axios.get(`https://api.timezonedb.com/v2.1/searchCity?key=0CT7UWY8ACJO&q=${event.target.value}&format=json`);
-        if (response.data.status === 'OK' && response.data.zones.length > 0) {
+        const response = await axios.get(`https://api.timezonedb.com/v2.1/list-time-zone`, {
+          params: {
+            key: '0CT7UWY8ACJO',
+            format: 'json',
+            country: event.target.value,
+            fields: 'zoneName,countryName,countryCode'
+          },
+          timeout: 5000
+        });
+        if (response.data.status === 'OK' && response.data.zones?.length > 0) {
           const cityData = response.data.zones[0];
           setLocation(cityData.cityName || event.target.value);
           setCountry(cityData.countryName || '');
