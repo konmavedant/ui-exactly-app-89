@@ -75,8 +75,8 @@ const RuneClock: React.FC = () => {
               <img 
                 src={hourHandImage} 
                 alt="Hour Hand" 
-                className="h-[45%] max-h-[220px] w-auto transform -translate-y-[3.5%]"
-                style={{ transformOrigin: 'center 58%' }}
+                className="h-[45%] max-h-[220px] w-auto transform -translate-y-0"
+                style={{ transformOrigin: 'center 50%' }}
               />
             </div>
           </div>
@@ -90,8 +90,8 @@ const RuneClock: React.FC = () => {
               <img 
                 src={minuteHandImage} 
                 alt="Minute Hand" 
-                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[5%]"
-                style={{ transformOrigin: 'center 55%' }}
+                className="h-[55%] max-h-[270px] w-auto transform -translate-y-0"
+                style={{ transformOrigin: 'center 50%' }}
               />
             </div>
           </div>
