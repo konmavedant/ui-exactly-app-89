@@ -66,7 +66,7 @@ const RuneClock: React.FC = () => {
     }
   }, [latestState]);
   const [zodiacSign, setZodiacSign] = useState<string>(() => 
-    state?.dateOfBirth ? getZodiacSign(new Date(state.dateOfBirth)) : "Scorpio"
+    latestState?.dateOfBirth ? getZodiacSign(new Date(latestState.dateOfBirth)) : "Scorpio"
   );
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
