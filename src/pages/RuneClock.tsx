@@ -5,6 +5,7 @@ import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
 import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
 import { format, formatInTimeZone } from 'date-fns-tz';
+import axios from 'axios';
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -35,25 +36,48 @@ const RuneClock: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [timezone]);
 
-  // Placeholder for location search -  replace with actual search functionality
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
-    // In a real application, you would make an API call here to get the timezone for the searched location.
-    // Example:  fetch(`/api/timezone?location=${searchInput}`).then(...)
-    if(searchInput === "London"){
-        setLocation("London");
-        setCountry("United Kingdom");
-        setTimezone("Europe/London");
-    } else if (searchInput === "Tokyo"){
-        setLocation("Tokyo");
-        setCountry("Japan");
-        setTimezone("Asia/Tokyo");
-    } else {
-        setLocation("Chicago");
-        setCountry("United States");
-        setTimezone("America/Chicago");
+    if (event.target.value.length > 2) {
+      try {
+        const response = await axios.get(`https://api.timezonedb.com/v2.1/searchCity?key=YOUR_API_KEY&q=${event.target.value}&format=json`);
+        if (response.data.status === 'OK' && response.data.zones.length > 0) {
+          const cityData = response.data.zones[0];
+          setLocation(cityData.cityName);
+          setCountry(cityData.countryName);
+          setTimezone(cityData.zoneName);
+          
+          // Update zodiac sign based on current date
+          const currentDate = new Date();
+          const zodiacSigns = {
+            'Aries': [321, 419],
+            'Taurus': [420, 520],
+            'Gemini': [521, 620],
+            'Cancer': [621, 722],
+            'Leo': [723, 822],
+            'Virgo': [823, 922],
+            'Libra': [923, 1022],
+            'Scorpio': [1023, 1121],
+            'Sagittarius': [1122, 1221],
+            'Capricorn': [1222, 119],
+            'Aquarius': [120, 218],
+            'Pisces': [219, 320]
+          };
+          
+          const monthDay = parseInt(format(currentDate, 'Mdd'));
+          const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
+            if (start > end) {
+              return monthDay >= start || monthDay <= end;
+            }
+            return monthDay >= start && monthDay <= end;
+          });
+          
+          setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
+        }
+      } catch (error) {
+        console.error('Error fetching timezone data:', error);
+      }
     }
-
   };
 
 
