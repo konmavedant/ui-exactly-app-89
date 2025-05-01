@@ -40,8 +40,14 @@ const RuneClock: React.FC = () => {
   const latestState = location.state as LocationState;
   
   const [currentTime, setCurrentTime] = useState<string>("");
-  const [location_, setLocation] = useState<string>(latestState?.placeOfBirth?.split(',')[0] || "Chicago");
-  const [country, setCountry] = useState<string>(latestState?.placeOfBirth?.split(',')[1]?.trim() || "United States");
+  const [location_, setLocation] = useState<string>(() => {
+    const city = latestState?.placeOfBirth?.split(',')[0];
+    return city || "Chicago";
+  });
+  const [country, setCountry] = useState<string>(() => {
+    const countryPart = latestState?.placeOfBirth?.split(',')[1];
+    return countryPart?.trim() || "United States";
+  });
 
   useEffect(() => {
     if (latestState?.placeOfBirth) {
