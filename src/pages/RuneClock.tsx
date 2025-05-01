@@ -71,11 +71,9 @@ const RuneClock: React.FC = () => {
             className="absolute top-0 left-0 w-full h-full"
             style={{ transform: `rotate(${hourRotation}deg)` }}
           >
-            <img 
-              src={hourHandImage} 
-              alt="Hour Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-[45%] w-auto origin-center"
-            />
+            <div className="absolute top-1/2 left-1/2 w-[8%] h-[33%] bg-white rounded-t-md transform -translate-x-1/2 -translate-y-full origin-bottom">
+              {/* White hour hand styled to match reference image */}
+            </div>
           </div>
           
           {/* Minute Hand */}
@@ -83,12 +81,13 @@ const RuneClock: React.FC = () => {
             className="absolute top-0 left-0 w-full h-full"
             style={{ transform: `rotate(${minuteRotation}deg)` }}
           >
-            <img 
-              src={minuteHandImage} 
-              alt="Minute Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-[55%] w-auto origin-center"
-            />
+            <div className="absolute top-1/2 left-1/2 w-[4%] h-[43%] bg-white rounded-t-md transform -translate-x-1/2 -translate-y-full origin-bottom">
+              {/* White minute hand styled to match reference image */}
+            </div>
           </div>
+          
+          {/* Center Point */}
+          <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-[#3498db] rounded-full transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
         </div>
       </div>
       
@@ -105,8 +104,8 @@ const RuneClock: React.FC = () => {
       
       {/* Search Bar */}
       <div className="mt-auto px-6 pb-10 pt-6">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <div className="relative flex items-center">
+          <div className="absolute left-3">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
