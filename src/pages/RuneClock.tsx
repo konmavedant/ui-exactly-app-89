@@ -104,7 +104,7 @@ const RuneClock: React.FC = () => {
 
       {/* Clock Image and Hands */}
       <div className="flex-1 flex justify-center items-center my-4 px-4">
-        <div className="relative w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]">
+        <div className="relative w-[95vw] h-[95vw] sm:w-[600px] sm:h-[600px] md:w-[700px] md:h-[700px] lg:w-[800px] lg:h-[800px]">
           {/* Rune Clock Background */}
           <img 
             src={runeClockImage} 
@@ -114,30 +114,30 @@ const RuneClock: React.FC = () => {
 
           {/* Hour Hand */}
           <div 
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
             style={{ transform: `rotate(${hourRotation}deg)` }}
           >
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 origin-center">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <img 
                 src={hourHandImage} 
                 alt="Hour Hand" 
-                className="h-[45%] max-h-[220px] w-auto transform -translate-y-[20%]"
-                style={{ transformOrigin: 'center 50%' }}
+                className="h-[50%] max-h-[300px] w-auto transform -translate-y-[30%]"
+                style={{ transformOrigin: 'bottom center' }}
               />
             </div>
           </div>
 
           {/* Minute Hand */}
           <div 
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            className="absolute top-0 left-0 w-full h-full pointer-events-none z-20"
             style={{ transform: `rotate(${minuteRotation}deg)` }}
           >
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 origin-center">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <img 
                 src={minuteHandImage} 
                 alt="Minute Hand" 
-                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[25%]"
-                style={{ transformOrigin: 'center 50%' }}
+                className="h-[60%] max-h-[350px] w-auto transform -translate-y-[35%]"
+                style={{ transformOrigin: 'bottom center' }}
               />
             </div>
           </div>
