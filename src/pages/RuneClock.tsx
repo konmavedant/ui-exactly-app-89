@@ -5,7 +5,8 @@ import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
 import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
 import { format } from 'date-fns';
-import { useTimezone } from 'react-use-timezone';
+import { formatInTimeZone } from 'date-fns-tz';
+import { getTimeZones } from '@vvo/tzdb';
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -36,22 +37,21 @@ const RuneClock: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [timezone]);
 
-  const { timezones } = useTimezone();
-  
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
     setSearchInput(searchValue);
     
     if (searchValue.length > 2) {
+      const timezones = getTimeZones();
       const matchingTimezone = timezones.find(tz => 
         tz.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        tz.alternativeName.toLowerCase().includes(searchValue.toLowerCase())
+        tz.mainCities.some(city => city.toLowerCase().includes(searchValue.toLowerCase()))
       );
 
       if (matchingTimezone) {
-        const cityName = matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ') || searchValue;
+        const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
         setLocation(cityName);
-        setCountry(matchingTimezone.alternativeName);
+        setCountry(matchingTimezone.continentName);
         setTimezone(matchingTimezone.name);
 
           // Update zodiac sign based on current date
