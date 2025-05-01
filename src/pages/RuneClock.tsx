@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import runeClockImage from "/public/lovable-uploads/rune-clock-new.png";
+import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
+import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
 import { format, formatInTimeZone } from 'date-fns-tz';
 
 const RuneClock: React.FC = () => {
