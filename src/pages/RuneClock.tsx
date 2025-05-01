@@ -34,11 +34,31 @@ const getZodiacSign = (date: Date): string => {
   return 'Pisces';
 };
 
+const getTimezoneFromLocation = (location: string): string => {
+  const cityMap: { [key: string]: string } = {
+    'Mumbai': 'Asia/Kolkata',
+    'Delhi': 'Asia/Kolkata',
+    'Chicago': 'America/Chicago',
+    'New York': 'America/New_York',
+    'London': 'Europe/London',
+    'Paris': 'Europe/Paris',
+    'Tokyo': 'Asia/Tokyo',
+    'Sydney': 'Australia/Sydney'
+  };
+
+  const city = Object.keys(cityMap).find(city => 
+    location.toLowerCase().includes(city.toLowerCase())
+  );
+  
+  return city ? cityMap[city] : 'UTC';
+};
+
 const RuneClock: React.FC = () => {
   const { state } = useLocation() as { state: LocationState };
+  const initialLocation = state?.placeOfBirth?.split(',')[0] || "Chicago";
   
   const [currentTime, setCurrentTime] = useState<string>("");
-  const [location_, setLocation] = useState<string>(state?.placeOfBirth?.split(',')[0] || "Chicago");
+  const [location_, setLocation] = useState<string>(initialLocation);
   const [country, setCountry] = useState<string>(state?.placeOfBirth?.split(',')[1]?.trim() || "United States");
   const [zodiacSign, setZodiacSign] = useState<string>(() => 
     state?.dateOfBirth ? getZodiacSign(new Date(state.dateOfBirth)) : "Scorpio"
@@ -46,15 +66,13 @@ const RuneClock: React.FC = () => {
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(0);
-  const [timezone, setTimezone] = useState<string>("America/Chicago");
+  const [timezone, setTimezone] = useState<string>(getTimezoneFromLocation(initialLocation));
   const [searchInput, setSearchInput] = useState<string>("");
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const localTime = formatInTimeZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss");
-      const tzTime = new Date(localTime);
-      
+      const tzTime = new Date(formatInTimeZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
       const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a');
       
       setCurrentTime(formattedTime);
@@ -74,18 +92,29 @@ const RuneClock: React.FC = () => {
     setSearchInput(searchValue);
 
     if (searchValue.length > 2) {
-      try {
-        const timezones = getTimeZones();
-        const matchingTimezone = timezones.find(tz => 
-          tz.name.toLowerCase().includes(searchValue) ||
-          tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
-        );
-
-        if (matchingTimezone) {
-          const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
-          setLocation(cityName || searchValue);
-          setCountry(matchingTimezone.continentName);
-          setTimezone(matchingTimezone.name);
+      setLocation(searchValue);
+      const newTimezone = getTimezoneFromLocation(searchValue);
+      setTimezone(newTimezone);
+      
+      // Update country based on location
+      const countryMap: { [key: string]: string } = {
+        'Mumbai': 'India',
+        'Delhi': 'India',
+        'Chicago': 'United States',
+        'New York': 'United States',
+        'London': 'United Kingdom',
+        'Paris': 'France',
+        'Tokyo': 'Japan',
+        'Sydney': 'Australia'
+      };
+      
+      const city = Object.keys(countryMap).find(city => 
+        searchValue.toLowerCase().includes(city.toLowerCase())
+      );
+      
+      if (city) {
+        setCountry(countryMap[city]);
+      }
 
           const currentDate = new Date();
           const monthDay = parseInt(format(currentDate, 'Mdd'));
