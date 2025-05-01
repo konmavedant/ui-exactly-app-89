@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import RuneClock from "./pages/RuneClock";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
@@ -18,6 +19,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/rune-clock" element={<RuneClock />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

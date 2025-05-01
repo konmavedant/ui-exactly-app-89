@@ -1,13 +1,19 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 
 const ProfileSetup: React.FC = () => {
+  const navigate = useNavigate();
   const [fullName, setFullName] = useState("Lorem Ipsum");
   const [dob, setDob] = useState("01 Jan 2002");
   const [placeOfBirth, setPlaceOfBirth] = useState("Chicago, United States");
+
+  const handleProceed = () => {
+    navigate('/rune-clock');
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative">
@@ -70,6 +76,7 @@ const ProfileSetup: React.FC = () => {
         {/* Proceed button */}
         <div className="mt-8 mb-10">
           <Button 
+            onClick={handleProceed}
             className="w-full h-16 text-2xl font-bold bg-appYellow hover:bg-appYellow/90 text-black rounded-xl"
           >
             Proceed
