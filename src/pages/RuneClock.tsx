@@ -38,51 +38,48 @@ const RuneClock: React.FC = () => {
   }, [timezone]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = event.target.value;
+    const searchValue = event.target.value.toLowerCase();
     setSearchInput(searchValue);
-    
+
     if (searchValue.length > 2) {
       const timezones = getTimeZones();
       const matchingTimezone = timezones.find(tz => 
-        tz.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        tz.mainCities.some(city => city.toLowerCase().includes(searchValue.toLowerCase()))
+        tz.name.toLowerCase().includes(searchValue) ||
+        tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
       );
 
       if (matchingTimezone) {
         const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
-        setLocation(cityName);
+        setLocation(cityName || searchValue);
         setCountry(matchingTimezone.continentName);
         setTimezone(matchingTimezone.name);
 
-          // Update zodiac sign based on current date
-          const currentDate = new Date();
-          const zodiacSigns = {
-            'Aries': [321, 419],
-            'Taurus': [420, 520],
-            'Gemini': [521, 620],
-            'Cancer': [621, 722],
-            'Leo': [723, 822],
-            'Virgo': [823, 922],
-            'Libra': [923, 1022],
-            'Scorpio': [1023, 1121],
-            'Sagittarius': [1122, 1221],
-            'Capricorn': [1222, 119],
-            'Aquarius': [120, 218],
-            'Pisces': [219, 320]
-          };
+        // Update zodiac sign based on current date
+        const currentDate = new Date();
+        const zodiacSigns = {
+          'Aries': [321, 419],
+          'Taurus': [420, 520],
+          'Gemini': [521, 620],
+          'Cancer': [621, 722],
+          'Leo': [723, 822],
+          'Virgo': [823, 922],
+          'Libra': [923, 1022],
+          'Scorpio': [1023, 1121],
+          'Sagittarius': [1122, 1221],
+          'Capricorn': [1222, 119],
+          'Aquarius': [120, 218],
+          'Pisces': [219, 320]
+        };
 
-          const monthDay = parseInt(format(currentDate, 'Mdd'));
-          const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
-            if (start > end) {
-              return monthDay >= start || monthDay <= end;
-            }
-            return monthDay >= start && monthDay <= end;
-          });
+        const monthDay = parseInt(format(currentDate, 'Mdd'));
+        const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
+          if (start > end) {
+            return monthDay >= start || monthDay <= end;
+          }
+          return monthDay >= start && monthDay <= end;
+        });
 
-          setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
-        }
-      } catch (error) {
-        console.error('Error fetching timezone data:', error);
+        setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
       }
     }
   };
