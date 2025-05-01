@@ -1,24 +1,34 @@
 
 import React, { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Search, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import runeClockImage from "/lovable-uploads/77360373-aaa6-447e-8255-80e4eadd17a1.png";
+import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
   const [location, setLocation] = useState<string>("Chicago");
   const [country, setCountry] = useState<string>("United States");
   const [zodiacSign, setZodiacSign] = useState<string>("Scorpio");
+  const [hours, setHours] = useState<number>(0);
+  const [minutes, setMinutes] = useState<number>(0);
+  const [seconds, setSeconds] = useState<number>(0);
   
   // Update time every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 || 12;
-      setCurrentTime(`${formattedHours}:${minutes} ${ampm}`);
+      
+      // Update digital clock
+      const currentHours = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentSeconds = now.getSeconds();
+      const ampm = currentHours >= 12 ? 'PM' : 'AM';
+      const formattedHours = currentHours % 12 || 12;
+      
+      setHours(currentHours);
+      setMinutes(currentMinutes);
+      setSeconds(currentSeconds);
+      setCurrentTime(`${formattedHours}:${currentMinutes.toString().padStart(2, '0')} ${ampm}`);
     };
     
     updateTime();
@@ -26,6 +36,11 @@ const RuneClock: React.FC = () => {
     
     return () => clearInterval(intervalId);
   }, []);
+  
+  // Calculate rotation angles for clock hands
+  const hourRotation = (hours % 12) * 30 + minutes * 0.5; // 30 degrees per hour, plus small adjustment for minutes
+  const minuteRotation = minutes * 6; // 6 degrees per minute
+  const secondRotation = seconds * 6; // 6 degrees per second
   
   return (
     <div className="flex flex-col min-h-screen bg-[#1A1F2C] text-white">
@@ -40,9 +55,37 @@ const RuneClock: React.FC = () => {
         <div className="w-8"></div> {/* Empty div for spacing */}
       </header>
       
-      {/* Clock Image */}
-      <div className="flex justify-center items-center my-8">
-        <img src={runeClockImage} alt="Rune Clock" className="w-4/5 max-w-xs" />
+      {/* Clock Image and Hands */}
+      <div className="flex justify-center items-center my-4 relative">
+        <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96">
+          {/* Rune Clock Background */}
+          <img 
+            src={runeClockImage} 
+            alt="Rune Clock" 
+            className="w-full h-full"
+          />
+          
+          {/* Hour Hand */}
+          <div 
+            className="absolute top-1/2 left-1/2 w-1 h-16 bg-appYellow rounded-full origin-bottom transform -translate-x-1/2 -translate-y-full"
+            style={{ transform: `translateX(-50%) rotate(${hourRotation}deg)`, transformOrigin: 'bottom' }}
+          ></div>
+          
+          {/* Minute Hand */}
+          <div 
+            className="absolute top-1/2 left-1/2 w-0.5 h-24 bg-white rounded-full origin-bottom transform -translate-x-1/2 -translate-y-full"
+            style={{ transform: `translateX(-50%) rotate(${minuteRotation}deg)`, transformOrigin: 'bottom' }}
+          ></div>
+          
+          {/* Second Hand */}
+          <div 
+            className="absolute top-1/2 left-1/2 w-0.5 h-28 bg-red-500 rounded-full origin-bottom transform -translate-x-1/2 -translate-y-full"
+            style={{ transform: `translateX(-50%) rotate(${secondRotation}deg)`, transformOrigin: 'bottom' }}
+          ></div>
+          
+          {/* Center Point */}
+          <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
       </div>
       
       {/* Location & Time Info */}
