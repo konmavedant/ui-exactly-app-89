@@ -45,7 +45,7 @@ const RuneClock: React.FC = () => {
   const secondRotation = seconds * 6; // 6 degrees per second
   
   return (
-    <div className="flex flex-col min-h-screen bg-[#1A1F2C] text-white font-inknut">
+    <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
       {/* Header */}
       <header className="flex justify-between items-center p-6">
         <div className="w-8 h-8">
@@ -69,48 +69,48 @@ const RuneClock: React.FC = () => {
           
           {/* Hour Hand */}
           <div 
-            className="absolute top-1/2 left-1/2 w-full h-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            className="absolute top-0 left-0 w-full h-full"
             style={{ transform: `rotate(${hourRotation}deg)` }}
           >
             <img 
               src={hourHandImage} 
               alt="Hour Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[85%] w-[40%] h-auto"
-              style={{ transformOrigin: 'bottom center' }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[92%] w-[38%] h-auto"
+              style={{ transformOrigin: 'center bottom' }}
             />
           </div>
           
           {/* Minute Hand */}
           <div 
-            className="absolute top-1/2 left-1/2 w-full h-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            className="absolute top-0 left-0 w-full h-full"
             style={{ transform: `rotate(${minuteRotation}deg)` }}
           >
             <img 
               src={minuteHandImage} 
               alt="Minute Hand" 
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[75%] w-[35%] h-auto"
-              style={{ transformOrigin: 'bottom center' }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[85%] w-[32%] h-auto"
+              style={{ transformOrigin: 'center bottom' }}
             />
           </div>
           
           {/* Center Point */}
-          <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-1/2 w-5 h-5 bg-[#00B0DF] rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
         </div>
       </div>
       
       {/* Location & Time Info */}
-      <div className="text-center px-6 space-y-4">
+      <div className="text-center px-6 py-6 space-y-5">
         <h2 className="text-3xl md:text-4xl font-bold text-appYellow">{location}</h2>
         <h3 className="text-5xl md:text-6xl font-bold text-white">{currentTime}</h3>
         <p className="text-2xl md:text-3xl text-gray-400">{country}</p>
         
-        <div className="mt-6 mb-6">
+        <div className="mt-8 mb-6">
           <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
       
       {/* Search Bar */}
-      <div className="mt-auto px-6 pb-10 pt-4">
+      <div className="mt-auto px-6 pb-10 pt-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-500" />
