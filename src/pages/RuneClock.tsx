@@ -135,7 +135,7 @@ const RuneClock: React.FC = () => {
       </header>
 
       <div className="flex-1 flex justify-center items-center my-4 px-4">
-        <div className="relative w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]">
+        <div className="relative w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] md:w-[650px] md:h-[650px] lg:w-[800px] lg:h-[800px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
