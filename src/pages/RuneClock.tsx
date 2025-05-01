@@ -52,12 +52,15 @@ const RuneClock: React.FC = () => {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
+      const localTime = formatInTimeZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss");
+      const tzTime = new Date(localTime);
+      
       const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a');
-
+      
       setCurrentTime(formattedTime);
-      setHours(now.getHours());
-      setMinutes(now.getMinutes());
-      setSeconds(now.getSeconds());
+      setHours(tzTime.getHours());
+      setMinutes(tzTime.getMinutes());
+      setSeconds(tzTime.getSeconds());
     };
 
     updateTime();
