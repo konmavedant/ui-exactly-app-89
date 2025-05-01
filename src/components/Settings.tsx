@@ -31,7 +31,6 @@ const Settings: React.FC = () => {
         </div>
 
         <div className="pt-4 px-6">
-          <h2 className="text-xl text-gray-400 mb-4">Account Settings</h2>
 
           <div className="space-y-4">
             <Link to="/edit-profile" className="flex items-center justify-between py-2">

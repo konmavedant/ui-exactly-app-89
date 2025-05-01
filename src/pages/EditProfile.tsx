@@ -31,14 +31,6 @@ const EditProfile: React.FC = () => {
       </div>
 
       <div className="flex-1 bg-white rounded-t-3xl -mt-2 px-6 py-8">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-white">
-            <div className="text-6xl text-gray-400">👤</div>
-          </div>
-          <button className="mt-4 text-black text-xl font-medium">
-            Change Picture
-          </button>
-        </div>
 
         <div className="space-y-6">
           <div>
