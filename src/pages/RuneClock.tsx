@@ -58,7 +58,7 @@ const RuneClock: React.FC = () => {
       
       {/* Clock Image and Hands */}
       <div className="flex-1 flex justify-center items-center my-4 px-4">
-        <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px]">
+        <div className="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]">
           {/* Rune Clock Background */}
           <img 
             src={runeClockImage} 
