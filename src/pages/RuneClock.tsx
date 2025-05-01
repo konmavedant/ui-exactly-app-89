@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
 import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
-import { format, formatInTimeZone } from 'date-fns-tz';
-import axios from 'axios';
+import { format } from 'date-fns';
+import { useTimezone } from 'react-use-timezone';
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -36,24 +36,23 @@ const RuneClock: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [timezone]);
 
-  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-    if (event.target.value.length > 2) {
-      try {
-        const response = await axios.get(`https://api.timezonedb.com/v2.1/list-time-zone`, {
-          params: {
-            key: '0CT7UWY8ACJO',
-            format: 'json',
-            country: event.target.value,
-            fields: 'zoneName,countryName,countryCode'
-          },
-          timeout: 5000
-        });
-        if (response.data.status === 'OK' && response.data.zones?.length > 0) {
-          const cityData = response.data.zones[0];
-          setLocation(cityData.cityName || event.target.value);
-          setCountry(cityData.countryName || '');
-          setTimezone(cityData.zoneName);
+  const { timezones } = useTimezone();
+  
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = event.target.value;
+    setSearchInput(searchValue);
+    
+    if (searchValue.length > 2) {
+      const matchingTimezone = timezones.find(tz => 
+        tz.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        tz.alternativeName.toLowerCase().includes(searchValue.toLowerCase())
+      );
+
+      if (matchingTimezone) {
+        const cityName = matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ') || searchValue;
+        setLocation(cityName);
+        setCountry(matchingTimezone.alternativeName);
+        setTimezone(matchingTimezone.name);
 
           // Update zodiac sign based on current date
           const currentDate = new Date();
