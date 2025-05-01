@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
+import runeClockImage from "/public/lovable-uploads/rune-clock-new.png";
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
 import minuteHandImage from "/lovable-uploads/aad40062-bea9-40da-ba51-7130d085ca74.png";
+import { format, formatInTimeZone } from 'date-fns-tz';
 
 const RuneClock: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -14,35 +14,53 @@ const RuneClock: React.FC = () => {
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(0);
-  
+  const [timezone, setTimezone] = useState<string>("America/Chicago");
+  const [searchInput, setSearchInput] = useState<string>("");
+
   // Update time every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      
-      // Update digital clock
-      const currentHours = now.getHours();
-      const currentMinutes = now.getMinutes();
-      const currentSeconds = now.getSeconds();
-      const ampm = currentHours >= 12 ? 'PM' : 'AM';
-      const formattedHours = currentHours % 12 || 12;
-      
-      setHours(currentHours);
-      setMinutes(currentMinutes);
-      setSeconds(currentSeconds);
-      setCurrentTime(`${formattedHours}:${currentMinutes.toString().padStart(2, '0')} ${ampm}`);
+      const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a'); // Use date-fns-tz for timezone support
+
+      setCurrentTime(formattedTime);
+      setHours(now.getHours());
+      setMinutes(now.getMinutes());
+      setSeconds(now.getSeconds());
     };
-    
+
     updateTime();
     const intervalId = setInterval(updateTime, 1000);
-    
+
     return () => clearInterval(intervalId);
-  }, []);
-  
+  }, [timezone]);
+
+  // Placeholder for location search -  replace with actual search functionality
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+    // In a real application, you would make an API call here to get the timezone for the searched location.
+    // Example:  fetch(`/api/timezone?location=${searchInput}`).then(...)
+    if(searchInput === "London"){
+        setLocation("London");
+        setCountry("United Kingdom");
+        setTimezone("Europe/London");
+    } else if (searchInput === "Tokyo"){
+        setLocation("Tokyo");
+        setCountry("Japan");
+        setTimezone("Asia/Tokyo");
+    } else {
+        setLocation("Chicago");
+        setCountry("United States");
+        setTimezone("America/Chicago");
+    }
+
+  };
+
+
   // Calculate rotation angles for clock hands
   const hourRotation = (hours % 12) * 30 + minutes * 0.5; // 30 degrees per hour, plus small adjustment for minutes
   const minuteRotation = minutes * 6; // 6 degrees per minute
-  
+
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
       {/* Header */}
@@ -55,7 +73,7 @@ const RuneClock: React.FC = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
         <div className="w-8"></div> {/* Empty div for spacing */}
       </header>
-      
+
       {/* Clock Image and Hands */}
       <div className="flex-1 flex justify-center items-center my-4 px-4">
         <div className="relative w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]">
@@ -65,7 +83,7 @@ const RuneClock: React.FC = () => {
             alt="Rune Clock" 
             className="w-full h-full"
           />
-          
+
           {/* Hour Hand */}
           <div 
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -80,7 +98,7 @@ const RuneClock: React.FC = () => {
               />
             </div>
           </div>
-          
+
           {/* Minute Hand */}
           <div 
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -97,18 +115,18 @@ const RuneClock: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Location & Time Info */}
       <div className="text-center px-6 py-6 space-y-5">
         <h2 className="text-3xl md:text-4xl font-bold text-appYellow">{location}</h2>
         <h3 className="text-5xl md:text-6xl font-bold text-white">{currentTime}</h3>
         <p className="text-2xl md:text-3xl text-gray-400">{country}</p>
-        
+
         <div className="mt-8 mb-6">
           <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
-      
+
       {/* Search Bar */}
       <div className="mt-auto px-6 pb-10 pt-6">
         <div className="relative flex items-center">
@@ -118,6 +136,8 @@ const RuneClock: React.FC = () => {
           <Input 
             className="pl-10 pr-4 py-3 h-14 rounded-full bg-white text-gray-800 placeholder-gray-400 w-full"
             placeholder="Search location..."
+            onChange={handleSearchChange}
+            value={searchInput}
           />
         </div>
       </div>
