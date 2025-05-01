@@ -8,10 +8,21 @@ import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getTimeZones } from '@vvo/tzdb';
 
+import { useLocation } from "react-router-dom";
+
+interface LocationState {
+  fullName: string;
+  dateOfBirth: Date;
+  placeOfBirth: string;
+}
+
 const RuneClock: React.FC = () => {
+  const location = useLocation();
+  const state = location.state as LocationState;
+  
   const [currentTime, setCurrentTime] = useState<string>("");
-  const [location, setLocation] = useState<string>("Chicago");
-  const [country, setCountry] = useState<string>("United States");
+  const [location_, setLocation] = useState<string>(state?.placeOfBirth?.split(',')[0] || "Chicago");
+  const [country, setCountry] = useState<string>(state?.placeOfBirth?.split(',')[1]?.trim() || "United States");
   const [zodiacSign, setZodiacSign] = useState<string>("Scorpio");
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);

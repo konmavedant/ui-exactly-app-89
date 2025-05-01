@@ -3,16 +3,26 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const ProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("Lorem Ipsum");
-  const [dob, setDob] = useState("01 Jan 2002");
+  const [date, setDate] = useState<Date>();
   const [placeOfBirth, setPlaceOfBirth] = useState("Chicago, United States");
 
   const handleProceed = () => {
-    navigate('/rune-clock');
+    navigate('/rune-clock', { 
+      state: { 
+        fullName, 
+        dateOfBirth: date,
+        placeOfBirth 
+      } 
+    });
   };
 
   return (
@@ -34,7 +44,7 @@ const ProfileSetup: React.FC = () => {
 
       {/* Form fields */}
       <div className="px-8 flex flex-col gap-6">
-        <div>
+        <div className="text-left">
           <label htmlFor="fullName" className="block text-2xl font-bold mb-2">
             Full Name
           </label>
@@ -46,22 +56,35 @@ const ProfileSetup: React.FC = () => {
           />
         </div>
 
-        <div>
-          <label htmlFor="dob" className="block text-2xl font-bold mb-2">
+        <div className="text-left">
+          <label className="block text-2xl font-bold mb-2">
             DOB
           </label>
-          <div className="relative">
-            <Input
-              id="dob"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-              className="h-16 text-xl px-5 rounded-xl border border-gray-300"
-            />
-            <Calendar className="absolute right-5 top-1/2 transform -translate-y-1/2 w-6 h-6" />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "h-16 text-xl px-5 rounded-xl border border-gray-300 w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
 
-        <div>
+        <div className="text-left">
           <label htmlFor="birthplace" className="block text-2xl font-bold mb-2">
             Place of Birth
           </label>
