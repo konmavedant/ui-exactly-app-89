@@ -1,16 +1,19 @@
+
 import { Avatar } from '@/components/ui/avatar';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const SettingsPage = () => {
+const Settings = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#231F20]">
       {/* Yellow header */}
       <div className="bg-[#FFFC00] px-6 pt-12 pb-4">
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-black">
+          <button onClick={() => navigate(-1)} className="text-black">
             <ArrowLeft size={24} strokeWidth={2.5} />
-          </Link>
+          </button>
           <h1 className="text-3xl font-bold text-black">Settings</h1>
         </div>
       </div>
@@ -46,13 +49,8 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
-
-      {/* iPhone-style bottom indicator */}
-      <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-2 bg-white">
-        <div className="w-32 h-1 rounded-full bg-black opacity-20"></div>
-      </div>
     </div>
   );
 };
 
-export default SettingsPage;
+export default Settings;

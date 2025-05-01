@@ -49,7 +49,7 @@ const RuneClock: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(0);
   const [timezone, setTimezone] = useState<string>("America/Chicago");
   const [searchInput, setSearchInput] = useState<string>("");
-  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateTime = () => {
@@ -128,7 +128,7 @@ const RuneClock: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
       <header className="flex justify-between items-center p-6">
         <button 
-          onClick={() => setShowSettings(true)}
+          onClick={() => navigate('/settings')}
           className="w-8 h-8"
         >
           <div className="w-8 h-0.5 bg-white mb-2"></div>
@@ -139,13 +139,7 @@ const RuneClock: React.FC = () => {
         <div className="w-8"></div>
       </header>
 
-      {/* Settings Modal */}
-      {showSettings && (
-        <Settings 
-          onClose={() => setShowSettings(false)} 
-          fullName={state?.fullName || "User"}
-        />
-      )}
+      
 
       <div className="flex-1 flex justify-center items-center my-4 px-4">
         <div className="relative w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] md:w-[650px] md:h-[650px] lg:w-[800px] lg:h-[800px]">
