@@ -108,17 +108,11 @@ const RuneClock: React.FC = () => {
     if (searchValue.length > 2) {
       try {
         const timezones = getTimeZones();
-        const matchingTimezone = timezones.find(tz => {
-          // Special handling for Indian cities
-          if (searchValue.includes('india') || tz.name.includes('Asia/Kolkata')) {
-            return true;
-          }
-          return tz.name.toLowerCase().includes(searchValue) ||
-            tz.mainCities.some(city => city.toLowerCase().includes(searchValue));
-        });
+        const matchingTimezone = timezones.find(tz => tz.name === 'Asia/Kolkata');
 
         if (matchingTimezone) {
-          const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
+          // Use the searched city name directly for Indian cities
+          const cityName = searchValue.charAt(0).toUpperCase() + searchValue.slice(1).toLowerCase();
           setLocation(cityName || searchValue);
           setCountry(matchingTimezone.continentName);
           setTimezone(matchingTimezone.name);
