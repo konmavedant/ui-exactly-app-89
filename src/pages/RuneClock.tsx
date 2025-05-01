@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import Settings from "@/components/Settings";
 import { Input } from "@/components/ui/input";
 import runeClockImage from "/lovable-uploads/f4e631be-5578-4d37-97a8-5e097279d63e.png";
 import hourHandImage from "/lovable-uploads/74772f87-43e0-407d-8577-ee2a9c96a0b9.png";
@@ -48,6 +49,7 @@ const RuneClock: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(0);
   const [timezone, setTimezone] = useState<string>("America/Chicago");
   const [searchInput, setSearchInput] = useState<string>("");
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -125,14 +127,25 @@ const RuneClock: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
       <header className="flex justify-between items-center p-6">
-        <div className="w-8 h-8">
+        <button 
+          onClick={() => setShowSettings(true)}
+          className="w-8 h-8"
+        >
           <div className="w-8 h-0.5 bg-white mb-2"></div>
           <div className="w-8 h-0.5 bg-white mb-2"></div>
           <div className="w-8 h-0.5 bg-white"></div>
-        </div>
+        </button>
         <h1 className="text-3xl md:text-4xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
         <div className="w-8"></div>
       </header>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <Settings 
+          onClose={() => setShowSettings(false)} 
+          fullName={state?.fullName || "User"}
+        />
+      )}
 
       <div className="flex-1 flex justify-center items-center my-4 px-4">
         <div className="relative w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] md:w-[650px] md:h-[650px] lg:w-[800px] lg:h-[800px]">
