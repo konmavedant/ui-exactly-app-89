@@ -7,8 +7,8 @@ const Settings: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFFC00]">
-      <div className="bg-[#FFFC00] px-6 pt-12 pb-6">
+    <div className="flex flex-col min-h-screen bg-[#231F20]">
+      <div className="bg-[#FFFC00] px-6 pt-12 pb-6 rounded-b-[32px]">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/rune-clock')} className="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
             <ArrowLeft size={24} strokeWidth={2.5} />
@@ -17,9 +17,9 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[32px] -mt-2">
-        <div className="max-w-2xl mx-auto p-6">
-          <div className="space-y-4">
+      <div className="flex-1 px-6 py-8">
+        <div className="space-y-4">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 space-y-4">
             <Link 
               to="/" 
               className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"

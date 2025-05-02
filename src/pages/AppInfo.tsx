@@ -7,8 +7,8 @@ const AppInfo: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFFC00]">
-      <div className="bg-[#FFFC00] px-6 pt-12 pb-6">
+    <div className="flex flex-col min-h-screen bg-[#231F20]">
+      <div className="bg-[#FFFC00] px-6 pt-12 pb-6 rounded-b-[32px]">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
             <ArrowLeft size={24} strokeWidth={2.5} />
@@ -17,9 +17,9 @@ const AppInfo: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[32px] -mt-2 px-6 py-8">
-        <div className="max-w-2xl mx-auto space-y-10">
-          <div className="bg-[#FFFC00]/10 rounded-2xl p-6">
+      <div className="flex-1 px-6 py-8">
+        <div className="space-y-10">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6">
             <h2 className="text-2xl font-bold text-[#231F20] mb-4">About Rune Clock</h2>
             <p className="text-lg text-gray-700 leading-relaxed">
               The Rune Clock app is a unique timepiece that combines traditional timekeeping with runic symbolism. 
