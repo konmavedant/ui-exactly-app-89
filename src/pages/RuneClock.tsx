@@ -225,7 +225,7 @@ const RuneClock: React.FC = () => {
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
-            className="pl-10 pr-4 py-3 h-14 rounded-full bg-white text-gray-800 placeholder-gray-400 w-full"
+            className="pl-10 pr-4 py-2 h-12 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[90%] mx-auto"
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
