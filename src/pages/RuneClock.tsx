@@ -158,18 +158,18 @@ const RuneClock: React.FC = () => {
       <header className="flex justify-between items-center p-2">
         <button 
           onClick={() => navigate('/settings')}
-          className="w-8 h-8 relative z-50"
+          className="w-6 h-6 relative z-50"
         >
-          <div className="w-8 h-0.5 bg-white mb-2"></div>
-          <div className="w-8 h-0.5 bg-white mb-2"></div>
-          <div className="w-8 h-0.5 bg-white"></div>
+          <div className="w-6 h-0.5 bg-white mb-1.5"></div>
+          <div className="w-6 h-0.5 bg-white mb-1.5"></div>
+          <div className="w-6 h-0.5 bg-white"></div>
         </button>
-        <h1 className="text-4xl md:text-5xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
-        <div className="w-8"></div>
+        <h1 className="text-3xl md:text-4xl font-bold text-appYellow text-center flex-1">Rune Clock</h1>
+        <div className="w-6"></div>
       </header>
 
       <div className="flex flex-col items-center justify-center flex-1 px-4 -mt-20">
-        <div className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[500px] md:h-[500px] lg:w-[550px] lg:h-[550px]">
+        <div className="relative w-[380px] h-[380px] sm:w-[480px] sm:h-[480px] md:w-[530px] md:h-[530px] lg:w-[580px] lg:h-[580px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
