@@ -158,7 +158,7 @@ const RuneClock: React.FC = () => {
       <header className="flex justify-between items-center p-2">
         <button 
           onClick={() => navigate('/settings')}
-          className="w-8 h-8"
+          className="w-8 h-8 relative z-50"
         >
           <div className="w-8 h-0.5 bg-white mb-2"></div>
           <div className="w-8 h-0.5 bg-white mb-2"></div>
