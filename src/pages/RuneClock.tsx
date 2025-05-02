@@ -170,8 +170,8 @@ const RuneClock: React.FC = () => {
 
 
 
-      <div className="flex justify-center items-center px-4">
-        <div className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[550px] md:h-[550px] lg:w-[650px] lg:h-[650px]">
+      <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
+        <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
@@ -206,38 +206,36 @@ const RuneClock: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="text-center px-4 space-y-1 -mt-2">
-        <h2 className="text-2xl md:text-3xl font-bold text-appYellow">{location_}</h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-white">{currentTime}</h3>
-        <p className="text-xl md:text-2xl text-gray-400">{country}</p>
-
-        <div className="mt-6 mb-4">
-          <h3 className="text-xl md:text-2xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
+        <div className="text-center mt-8 space-y-3">
+          <h2 className="text-3xl font-bold text-appYellow">{location_}</h2>
+          <h3 className="text-5xl font-bold text-white">{currentTime}</h3>
+          <p className="text-xl text-gray-400">{country}</p>
+          <h3 className="text-2xl font-bold text-appYellow mt-4">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 
-      <div className="px-4 pb-4 transition-all duration-300" style={{ 
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 transition-all duration-300" style={{ 
         position: 'fixed',
         top: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
-        left: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
-        transform: document.activeElement?.id === 'location-search' ? 'translate(-50%, -50%)' : 'none',
-        width: document.activeElement?.id === 'location-search' ? '100%' : 'auto',
-        bottom: document.activeElement?.id === 'location-search' ? 'auto' : '0',
+        left: document.activeElement?.id === 'location-search' ? '50%' : '50%',
+        transform: document.activeElement?.id === 'location-search' ? 'translate(-50%, -50%)' : 'translateX(-50%)',
+        width: '100%',
+        maxWidth: '500px',
         zIndex: document.activeElement?.id === 'location-search' ? 50 : 1,
       }}>
         <div className="relative flex items-center justify-center">
-          <div className="absolute left-[10%] z-10">
+          <div className="absolute left-6 z-10">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
             id="location-search"
-            className="pl-12 pr-4 py-2 h-11 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[85%] transition-all duration-300"
+            className="pl-12 pr-4 py-2 h-11 rounded-full bg-white/90 backdrop-blur-sm text-gray-800 placeholder-gray-500 w-full shadow-lg transition-all duration-300"
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
             onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+            onFocus={(e) => e.currentTarget.select()}
           />
         </div>
         {searchInput && (
