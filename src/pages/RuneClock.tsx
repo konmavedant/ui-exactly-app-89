@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import Settings from "@/components/Settings";
@@ -20,7 +19,7 @@ interface LocationState {
 const getZodiacSign = (date: Date): string => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  
+
   if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
   if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
   if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
@@ -38,7 +37,7 @@ const getZodiacSign = (date: Date): string => {
 const RuneClock: React.FC = () => {
   const location = useLocation();
   const latestState = location.state as LocationState;
-  
+
   const [currentTime, setCurrentTime] = useState<string>("");
   const [location_, setLocation] = useState<string>(() => {
     const city = latestState?.placeOfBirth?.split(',')[0];
@@ -54,7 +53,7 @@ const RuneClock: React.FC = () => {
       const [city, countryPart] = latestState.placeOfBirth.split(',');
       setLocation(city);
       setCountry(countryPart?.trim() || country);
-      
+
       // Update timezone based on new location
       try {
         const timezones = getTimeZones();
@@ -86,9 +85,9 @@ const RuneClock: React.FC = () => {
       const now = new Date();
       const localTime = formatInTimeZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss");
       const tzTime = new Date(localTime);
-      
+
       const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a');
-      
+
       setCurrentTime(formattedTime);
       setHours(tzTime.getHours());
       setMinutes(tzTime.getMinutes());
@@ -169,9 +168,9 @@ const RuneClock: React.FC = () => {
         <div className="w-8"></div>
       </header>
 
-      
 
-      <div className="flex justify-center items-center px-4 py-2">
+
+      <div className="flex justify-center items-center px-4">
         <div className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[550px] md:h-[550px] lg:w-[650px] lg:h-[650px]">
           <img 
             src={runeClockImage} 
@@ -209,28 +208,39 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-center px-4 py-1 space-y-1">
-        <h2 className="text-xl md:text-2xl font-bold text-appYellow">{location_}</h2>
-        <h3 className="text-3xl md:text-4xl font-bold text-white">{currentTime}</h3>
-        <p className="text-lg md:text-xl text-gray-400">{country}</p>
+      <div className="text-center px-4 space-y-1 -mt-2">
+        <h2 className="text-2xl md:text-3xl font-bold text-appYellow">{location_}</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-white">{currentTime}</h3>
+        <p className="text-xl md:text-2xl text-gray-400">{country}</p>
 
         <div className="mt-6 mb-4">
-          <h3 className="text-2xl md:text-3xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
+          <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 transition-all duration-300" style={{ 
+        position: searchInput ? 'fixed' : 'relative',
+        top: searchInput ? '50%' : 'auto',
+        left: searchInput ? '50%' : 'auto',
+        transform: searchInput ? 'translate(-50%, -50%)' : 'none',
+        width: searchInput ? '100%' : 'auto',
+        zIndex: searchInput ? 50 : 1,
+      }}>
         <div className="relative flex items-center justify-center">
-          <div className="absolute left-8">
+          <div className="absolute left-[10%] z-10">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
-            className="pl-10 pr-4 py-2 h-11 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[85%]"
+            className="pl-12 pr-4 py-2 h-11 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[85%] transition-all duration-300"
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
+            onBlur={() => !searchInput && setSearchInput('')}
           />
         </div>
+        {searchInput && (
+          <div className="fixed inset-0 bg-black/50 -z-10" onClick={() => setSearchInput('')} />
+        )}
       </div>
     </div>
   );
