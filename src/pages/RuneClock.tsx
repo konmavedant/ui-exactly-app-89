@@ -168,7 +168,7 @@ const RuneClock: React.FC = () => {
         <div className="w-8"></div>
       </header>
 
-      <div className="flex flex-col items-center justify-center flex-1 px-4 py-2 -mt-4">
+      <div className="flex flex-col items-center justify-center flex-1 px-4 -mt-12">
         <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px]">
           <img 
             src={runeClockImage} 
