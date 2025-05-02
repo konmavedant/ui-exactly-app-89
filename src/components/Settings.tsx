@@ -21,7 +21,7 @@ const Settings: React.FC = () => {
         <div className="max-w-2xl mx-auto p-6">
           <div className="space-y-4">
             <Link 
-              to="/edit-profile" 
+              to="/" 
               className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center gap-4">
