@@ -168,8 +168,8 @@ const RuneClock: React.FC = () => {
         <div className="w-8"></div>
       </header>
 
-      <div className="flex flex-col items-center justify-center flex-1 px-4 -mt-12">
-        <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px]">
+      <div className="flex flex-col items-center justify-center flex-1 px-4 -mt-20">
+        <div className="relative w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[470px] md:h-[470px] lg:w-[520px] lg:h-[520px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
@@ -213,7 +213,7 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-8 left-0 right-0 px-4 transition-all duration-300" style={{ 
+      <div className="fixed bottom-4 left-0 right-0 px-4 transition-all duration-300" style={{ 
         position: 'fixed',
         top: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
         left: document.activeElement?.id === 'location-search' ? '50%' : '50%',
