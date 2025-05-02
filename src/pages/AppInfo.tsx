@@ -19,7 +19,7 @@ const AppInfo: React.FC = () => {
 
       <div className="flex-1 px-6 py-8">
         <div className="space-y-10">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6">
+          <div className="bg-white backdrop-blur-sm rounded-2xl p-6">
             <h2 className="text-2xl font-bold text-[#231F20] mb-4">About Rune Clock</h2>
             <p className="text-lg text-gray-700 leading-relaxed">
               The Rune Clock app is a unique timepiece that combines traditional timekeeping with runic symbolism. 
@@ -28,7 +28,7 @@ const AppInfo: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#231F20] border-b border-[#FFFC00]/20 pb-2">Features</h2>
+            <h2 className="text-2xl font-bold text-[#FFFC00] border-b border-[#FFFC00]/20 pb-2">Features</h2>
             <div className="grid gap-6">
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                 <h3 className="text-xl font-bold text-[#231F20] mb-2">Personalized Time Display</h3>
