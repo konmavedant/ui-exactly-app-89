@@ -155,8 +155,8 @@ const RuneClock: React.FC = () => {
   const minuteRotation = minutes * 6;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#231F20] text-white font-inknut">
-      <header className="flex justify-between items-center p-4">
+    <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
+      <header className="flex justify-between items-center p-3">
         <button 
           onClick={() => navigate('/settings')}
           className="w-8 h-8"
@@ -171,8 +171,8 @@ const RuneClock: React.FC = () => {
 
       
 
-      <div className="flex-1 flex justify-center items-center px-4">
-        <div className="relative w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px]">
+      <div className="flex justify-center items-center px-4 py-2">
+        <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
@@ -209,10 +209,10 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-center px-6 py-2 space-y-2">
-        <h2 className="text-3xl md:text-4xl font-bold text-appYellow">{location_}</h2>
-        <h3 className="text-5xl md:text-6xl font-bold text-white">{currentTime}</h3>
-        <p className="text-2xl md:text-3xl text-gray-400">{country}</p>
+      <div className="text-center px-4 py-1 space-y-1">
+        <h2 className="text-2xl md:text-3xl font-bold text-appYellow">{location_}</h2>
+        <h3 className="text-4xl md:text-5xl font-bold text-white">{currentTime}</h3>
+        <p className="text-xl md:text-2xl text-gray-400">{country}</p>
 
         <div className="mt-8 mb-6">
           <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
