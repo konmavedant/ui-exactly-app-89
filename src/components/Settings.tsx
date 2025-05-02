@@ -20,14 +20,9 @@ const Settings: React.FC = () => {
       </div>
 
       <div className="flex-1 bg-white rounded-t-3xl -mt-2">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-white-200">
           <div className="flex items-center px-6 py-4">
-            <Avatar className="h-16 w-16 mr-4">
-              <div className="bg-gray-200 h-full w-full flex items-center justify-center">
-                <span className="text-2xl text-gray-400">👤</span>
-              </div>
-            </Avatar>
-            <div className="text-xl font-medium">{state?.fullName || "Guest User"}</div>
+            
           </div>
         </div>
 
