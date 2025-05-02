@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -22,62 +23,66 @@ const ProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white relative">
-      <div className="bg-appYellow h-[120px] w-full rounded-b-[40px] flex items-center px-6">
-        <button onClick={() => navigate('/rune-clock')} className="text-black">
-          <ArrowLeft size={24} strokeWidth={2.5} />
-        </button>
-        <h1 className="text-3xl font-bold text-black ml-4">Personal Details</h1>
+    <div className="flex flex-col min-h-screen bg-[#231F20]">
+      <div className="bg-[#FFFC00] px-6 pt-12 pb-6 rounded-b-[32px]">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate('/rune-clock')} className="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
+            <ArrowLeft size={24} strokeWidth={2.5} />
+          </button>
+          <h1 className="text-2xl font-bold text-black">Personal Details</h1>
+        </div>
       </div>
 
-      <div className="px-6 mt-8">
-        <div className="space-y-4">
-          <div className="text-left">
-            <label htmlFor="fullName" className="block text-xl font-bold mb-1">
-              Name
-            </label>
-            <Input
-              id="fullName"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="h-12 text-lg px-4 rounded-xl border border-gray-300"
-              placeholder="Enter your name"
-            />
-          </div>
+      <div className="flex-1 px-6 py-8">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 space-y-5">
+            <div>
+              <label htmlFor="fullName" className="block text-lg font-medium text-appYellow mb-2">
+                Name
+              </label>
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                placeholder="Enter your name"
+              />
+            </div>
 
-          <div className="text-left">
-            <label htmlFor="dateOfBirth" className="block text-xl font-bold mb-1">
-              Date of Birth (YYYY-MM-DD)
-            </label>
-            <Input
-              id="dateOfBirth"
-              type="text"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              className="h-12 text-lg px-4 rounded-xl border border-gray-300"
-              placeholder="YYYY-MM-DD"
-              pattern="\d{4}-\d{2}-\d{2}"
-            />
-          </div>
+            <div>
+              <label htmlFor="dateOfBirth" className="block text-lg font-medium text-appYellow mb-2">
+                Date of Birth
+              </label>
+              <Input
+                id="dateOfBirth"
+                type="text"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                placeholder="YYYY-MM-DD"
+                pattern="\d{4}-\d{2}-\d{2}"
+              />
+            </div>
 
-          <div className="text-left">
-            <label htmlFor="birthplace" className="block text-xl font-bold mb-1">
-              Place of Birth
-            </label>
-            <Input
-              id="birthplace"
-              value={placeOfBirth}
-              onChange={(e) => setPlaceOfBirth(e.target.value)}
-              className="h-12 text-lg px-4 rounded-xl border border-gray-300"
-              placeholder="For eg.: Mumbai, India"
-            />
+            <div>
+              <label htmlFor="birthplace" className="block text-lg font-medium text-appYellow mb-2">
+                Place of Birth
+              </label>
+              <Input
+                id="birthplace"
+                value={placeOfBirth}
+                onChange={(e) => setPlaceOfBirth(e.target.value)}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                placeholder="For eg.: Mumbai, India"
+              />
+            </div>
           </div>
 
           <Button 
             onClick={handleProceed}
-            className="w-full h-12 text-xl font-bold bg-appYellow hover:bg-appYellow/90 text-black rounded-xl mt-6"
+            className="w-full h-12 text-lg font-semibold bg-appYellow hover:bg-appYellow/90 text-black rounded-xl"
           >
-            Proceed
+            Continue to Rune Clock
           </Button>
         </div>
       </div>
