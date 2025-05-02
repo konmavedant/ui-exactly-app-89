@@ -214,28 +214,30 @@ const RuneClock: React.FC = () => {
         <p className="text-xl md:text-2xl text-gray-400">{country}</p>
 
         <div className="mt-6 mb-4">
-          <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 
       <div className="px-4 pb-4 transition-all duration-300" style={{ 
-        position: searchInput ? 'fixed' : 'relative',
-        top: searchInput ? '50%' : 'auto',
-        left: searchInput ? '50%' : 'auto',
-        transform: searchInput ? 'translate(-50%, -50%)' : 'none',
-        width: searchInput ? '100%' : 'auto',
-        zIndex: searchInput ? 50 : 1,
+        position: 'fixed',
+        top: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
+        left: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
+        transform: document.activeElement?.id === 'location-search' ? 'translate(-50%, -50%)' : 'none',
+        width: document.activeElement?.id === 'location-search' ? '100%' : 'auto',
+        bottom: document.activeElement?.id === 'location-search' ? 'auto' : '0',
+        zIndex: document.activeElement?.id === 'location-search' ? 50 : 1,
       }}>
         <div className="relative flex items-center justify-center">
           <div className="absolute left-[10%] z-10">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
+            id="location-search"
             className="pl-12 pr-4 py-2 h-11 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[85%] transition-all duration-300"
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
-            onBlur={() => !searchInput && setSearchInput('')}
+            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
           />
         </div>
         {searchInput && (
