@@ -154,7 +154,7 @@ const RuneClock: React.FC = () => {
   const minuteRotation = minutes * 6;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut">
+    <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut overflow-x-hidden">
       <header className="flex justify-between items-center p-2">
         <button 
           onClick={() => navigate('/settings')}
@@ -169,7 +169,7 @@ const RuneClock: React.FC = () => {
       </header>
 
       <div className="flex flex-col items-center justify-center flex-1 px-4 -mt-20">
-        <div className="relative w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[470px] md:h-[470px] lg:w-[520px] lg:h-[520px]">
+        <div className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[500px] md:h-[500px] lg:w-[550px] lg:h-[550px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
