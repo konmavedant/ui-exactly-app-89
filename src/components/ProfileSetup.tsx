@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ const ProfileSetup: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20]">
       <div className="bg-[#FFFC00] px-6 pt-12 pb-6 rounded-b-[32px]">
-        <div className="flex items-start gap-4"> {/* Changed to items-start for left alignment */}
+        <div className="flex items-start gap-4">
           <button onClick={() => navigate('/rune-clock')} className="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
             <ArrowLeft size={24} strokeWidth={2.5} />
           </button>
@@ -33,23 +34,23 @@ const ProfileSetup: React.FC = () => {
       </div>
 
       <div className="flex-1 px-6 py-8">
-        <div className="space-y-6"> {/* Removed max-w-md mx-auto */}
+        <div className="space-y-6">
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 space-y-5">
             <div>
-              <label htmlFor="fullName" className="block text-left text-lg font-medium text-appYellow mb-2"> {/* Added text-left */}
+              <label htmlFor="fullName" className="block text-left text-lg font-medium text-appYellow mb-2">
                 Name
               </label>
               <Input
                 id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full" {/* Added w-full */}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full"
                 placeholder="Enter your name"
               />
             </div>
 
             <div>
-              <label htmlFor="dateOfBirth" className="block text-left text-lg font-medium text-appYellow mb-2"> {/* Added text-left */}
+              <label htmlFor="dateOfBirth" className="block text-left text-lg font-medium text-appYellow mb-2">
                 Date of Birth
               </label>
               <Input
@@ -57,21 +58,21 @@ const ProfileSetup: React.FC = () => {
                 type="text"
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
-                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full" {/* Added w-full */}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full"
                 placeholder="YYYY-MM-DD"
                 pattern="\d{4}-\d{2}-\d{2}"
               />
             </div>
 
             <div>
-              <label htmlFor="birthplace" className="block text-left text-lg font-medium text-appYellow mb-2"> {/* Added text-left */}
+              <label htmlFor="birthplace" className="block text-left text-lg font-medium text-appYellow mb-2">
                 Place of Birth
               </label>
               <Input
                 id="birthplace"
                 value={placeOfBirth}
                 onChange={(e) => setPlaceOfBirth(e.target.value)}
-                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full" {/* Added w-full */}
+                className="h-12 text-base bg-white/10 border-white/20 text-white placeholder:text-gray-400 w-full"
                 placeholder="For eg.: Mumbai, India"
               />
             </div>
