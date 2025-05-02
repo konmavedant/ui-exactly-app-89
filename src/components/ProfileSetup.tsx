@@ -27,27 +27,27 @@ const ProfileSetup: React.FC = () => {
         <button onClick={() => navigate('/rune-clock')} className="text-black">
           <ArrowLeft size={24} strokeWidth={2.5} />
         </button>
-        <h1 className="text-3xl font-bold text-black ml-4">Get Started</h1>
+        <h1 className="text-3xl font-bold text-black ml-4">Personal Details</h1>
       </div>
 
       <div className="px-6 mt-8">
         <div className="space-y-4">
           <div className="text-left">
             <label htmlFor="fullName" className="block text-xl font-bold mb-1">
-              Full Name
+              Name
             </label>
             <Input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="h-12 text-lg px-4 rounded-xl border border-gray-300"
-              placeholder="Enter your full name"
+              placeholder="Enter your name"
             />
           </div>
 
           <div className="text-left">
             <label htmlFor="dateOfBirth" className="block text-xl font-bold mb-1">
-              DOB (YYYY-MM-DD)
+              Date of Birth (YYYY-MM-DD)
             </label>
             <Input
               id="dateOfBirth"
