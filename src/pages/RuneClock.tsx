@@ -215,7 +215,7 @@ const RuneClock: React.FC = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 transition-all duration-300" style={{ 
+      <div className="fixed bottom-8 left-0 right-0 px-4 transition-all duration-300" style={{ 
         position: 'fixed',
         top: document.activeElement?.id === 'location-search' ? '50%' : 'auto',
         left: document.activeElement?.id === 'location-search' ? '50%' : '50%',
