@@ -28,7 +28,7 @@ const AppInfo: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#FFFC00] border-b border-[#FFFC00]/20 pb-2">Features</h2>
+            <h2 className="text-2xl font-bold text-[#231F20] border-b border-[#FFFC00]/20 pb-2">Features</h2>
             <div className="grid gap-6">
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                 <h3 className="text-xl font-bold text-[#231F20] mb-2">Personalized Time Display</h3>
