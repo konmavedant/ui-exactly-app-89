@@ -150,46 +150,8 @@ const RuneClock: React.FC = () => {
     }
   };
 
-  // Calculate rune-adjusted rotations based on zodiac and location
-  const getRuneAdjustedRotation = (value: number, type: 'hour' | 'minute'): number => {
-    // Base rotation calculation
-    const baseRotation = type === 'hour' 
-      ? (value % 12) * 30 + minutes * 0.5
-      : value * 6;
-
-    // Zodiac influence (each zodiac sign affects rotation slightly differently)
-    const zodiacInfluence = {
-      'Aries': 15,
-      'Taurus': 30,
-      'Gemini': 45,
-      'Cancer': 60,
-      'Leo': 75,
-      'Virgo': 90,
-      'Libra': 105,
-      'Scorpio': 120,
-      'Sagittarius': 135,
-      'Capricorn': 150,
-      'Aquarius': 165,
-      'Pisces': 180
-    }[zodiacSign] || 0;
-
-    // Location influence (based on latitude - northern/southern hemisphere)
-    const locationParts = location_.split(' ');
-    const isNorthern = !locationParts.some(part => 
-      part.toLowerCase().includes('south') || 
-      part.toLowerCase().includes('antarctica')
-    );
-    const hemisphereInfluence = isNorthern ? 1 : -1;
-
-    // Calculate final rotation with influences
-    const adjustedRotation = baseRotation + 
-      (type === 'hour' ? zodiacInfluence / 12 : zodiacInfluence / 60) * hemisphereInfluence;
-
-    return adjustedRotation % 360;
-  };
-
-  const hourRotation = getRuneAdjustedRotation(hours, 'hour');
-  const minuteRotation = getRuneAdjustedRotation(minutes, 'minute');
+  const dateOfBirth = location.state?.dateOfBirth ? new Date(location.state.dateOfBirth) : undefined;
+  const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut overflow-x-hidden">
