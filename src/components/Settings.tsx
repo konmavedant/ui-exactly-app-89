@@ -29,7 +29,7 @@ const Settings: React.FC = () => {
         <div className="pt-4 px-6">
 
           <div className="space-y-4">
-            <Link to="/edit-profile" className="flex items-center justify-between py-2">
+            <Link to="/" className="flex items-center justify-between py-2">
               <span className="text-xl font-medium">Edit profile</span>
               <ChevronRight size={24} />
             </Link>
