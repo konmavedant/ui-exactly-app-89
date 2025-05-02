@@ -172,7 +172,7 @@ const RuneClock: React.FC = () => {
       
 
       <div className="flex justify-center items-center px-4 py-2">
-        <div className="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]">
+        <div className="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[550px] md:h-[550px] lg:w-[650px] lg:h-[650px]">
           <img 
             src={runeClockImage} 
             alt="Rune Clock" 
@@ -210,22 +210,22 @@ const RuneClock: React.FC = () => {
       </div>
 
       <div className="text-center px-4 py-1 space-y-1">
-        <h2 className="text-2xl md:text-3xl font-bold text-appYellow">{location_}</h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-white">{currentTime}</h3>
-        <p className="text-xl md:text-2xl text-gray-400">{country}</p>
+        <h2 className="text-xl md:text-2xl font-bold text-appYellow">{location_}</h2>
+        <h3 className="text-3xl md:text-4xl font-bold text-white">{currentTime}</h3>
+        <p className="text-lg md:text-xl text-gray-400">{country}</p>
 
-        <div className="mt-8 mb-6">
-          <h3 className="text-3xl md:text-4xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
+        <div className="mt-6 mb-4">
+          <h3 className="text-2xl md:text-3xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 
-      <div className="px-6 pb-4">
-        <div className="relative flex items-center">
-          <div className="absolute left-3">
+      <div className="px-4 pb-4">
+        <div className="relative flex items-center justify-center">
+          <div className="absolute left-8">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
           <Input 
-            className="pl-10 pr-4 py-2 h-12 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[90%] mx-auto"
+            className="pl-10 pr-4 py-2 h-11 rounded-full bg-white text-gray-800 placeholder-gray-400 w-[85%]"
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
