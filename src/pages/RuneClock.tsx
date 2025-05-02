@@ -207,7 +207,7 @@ const RuneClock: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center mt-4 space-y-2">
+        <div className="text-center -mt-8 space-y-2">
           <h2 className="text-2xl font-bold text-appYellow">{location_}</h2>
           <h3 className="text-4xl font-bold text-white">{currentTime}</h3>
           <p className="text-lg text-gray-400">{country}</p>
