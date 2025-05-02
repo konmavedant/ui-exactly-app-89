@@ -7,7 +7,7 @@ const Settings: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#231F20]">
+    <div className="flex flex-col min-h-screen bg-[#FFFC00]">
       <div className="bg-[#FFFC00] px-6 pt-12 pb-6">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/rune-clock')} className="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
