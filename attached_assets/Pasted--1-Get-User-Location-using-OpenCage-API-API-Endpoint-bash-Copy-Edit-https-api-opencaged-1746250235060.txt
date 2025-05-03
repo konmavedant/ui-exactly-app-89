@@ -1,0 +1,86 @@
+🔹 1. Get User Location using OpenCage API
+API Endpoint:
+
+bash
+Copy
+Edit
+https://api.opencagedata.com/geocode/v1/json?q=YOUR_LOCATION&key=YOUR_API_KEY
+Example Code:
+
+javascript
+Copy
+Edit
+async function getLatLngFromLocation(location, openCageApiKey) {
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${openCageApiKey}`;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const { lat, lng } = data.results[0].geometry;
+    return { lat, lng };
+  } else {
+    throw new Error("Location not found");
+  }
+}
+🔹 2. Get Local Time using GeoNames API
+API Endpoint:
+
+arduino
+Copy
+Edit
+http://api.geonames.org/timezoneJSON?lat=LAT&lng=LNG&username=YOUR_GEONAMES_USERNAME
+Example Code:
+
+javascript
+Copy
+Edit
+async function getLocalTimeFromGeoNames(lat, lng, geoNamesUsername) {
+  const url = `http://api.geonames.org/timezoneJSON?lat=${lat}&lng=${lng}&username=${geoNamesUsername}`;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.time) {
+    return data.time; // Format: "2025-05-03 14:30"
+  } else {
+    throw new Error("Time not found for coordinates");
+  }
+}
+🔹 3. Convert Local Time to Rune Clock Angles
+Your provided function is already correct:
+
+javascript
+Copy
+Edit
+function getRuneClockAngles(timeString) {
+  const [date, time] = timeString.split(' ');
+  const [hourStr, minuteStr] = time.split(':');
+  const hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+
+  const minuteAngle = (minute / 60) * 360;
+  const hourAngle = ((hour % 24) + minute / 60) * 15; // Rune clock has 24-hour divisions
+
+  return { hourAngle, minuteAngle };
+}
+🔹 4. Complete Integration Flow
+javascript
+Copy
+Edit
+async function getRuneClockFromLocation(location) {
+  const openCageKey = 'YOUR_OPENCAGE_API_KEY';
+  const geoNamesUser = 'YOUR_GEONAMES_USERNAME';
+
+  try {
+    const { lat, lng } = await getLatLngFromLocation(location, openCageKey);
+    const localTime = await getLocalTimeFromGeoNames(lat, lng, geoNamesUser);
+    const angles = getRuneClockAngles(localTime);
+    return angles; // { hourAngle, minuteAngle }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+🧠 Rune Clock Logic Recap:
+Minute Angle: (minutes / 60) * 360° → Full rotation
+
+Hour Angle: (hour + minute / 60) * 15° → Because Rune Clock has 24 divisions (360° / 24 = 15° per hour)
