@@ -82,24 +82,35 @@ const RuneClock: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const localTime = formatInTimeZone(now, timezone, "yyyy-MM-dd'T'HH:mm:ss");
-      const tzTime = new Date(localTime);
+    const updateTime = async () => {
+      try {
+        // Get coordinates from location
+        const { lat, lng } = await getLatLngFromLocation(location_);
+        
+        // Get local time for coordinates
+        const timeData = await getLocalTime(lat, lng);
+        const [datePart, timePart] = timeData.time.split(' ');
+        const [hours, minutes] = timePart.split(':').map(Number);
+        
+        // Format time for display
+        const formattedTime = format(
+          new Date().setHours(hours, minutes), 
+          'hh:mm a'
+        );
 
-      const formattedTime = formatInTimeZone(now, timezone, 'hh:mm a');
-
-      setCurrentTime(formattedTime);
-      setHours(tzTime.getHours());
-      setMinutes(tzTime.getMinutes());
-      setSeconds(tzTime.getSeconds());
+        setCurrentTime(formattedTime);
+        setHours(hours);
+        setMinutes(minutes);
+      } catch (error) {
+        console.error('Error fetching location time:', error);
+      }
     };
 
     updateTime();
-    const intervalId = setInterval(updateTime, 1000);
+    const intervalId = setInterval(updateTime, 60000); // Update every minute
 
     return () => clearInterval(intervalId);
-  }, [timezone]);
+  }, [location_]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value.toLowerCase();
