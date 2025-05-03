@@ -11,32 +11,37 @@ export function calculateRuneTime(
   location: string,
   dateOfBirth?: Date
 ): RuneTimeInfluence {
-  // Calculate base angles using 24-hour format
-  const minuteRotation = (minutes / 60) * 360; // 6° per minute
-  const hourRotation = ((hours % 24) + minutes / 60) * 15; // 15° per hour
+  // Calculate the day of the year (1-365)
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - start.getTime();
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
 
-  // Zodiac influence (reduced effect)
+  // Big arm (24-hour rotation)
+  const hourRotation = ((hours + minutes / 60) / 24) * 360;
+
+  // Small arm (yearly rotation)
+  const minuteRotation = (dayOfYear / 365) * 360;
+
+  // Apply zodiac influence (subtle effect)
   const zodiacInfluence = {
-    'Aries': { hour: 5, minute: 3 },
-    'Taurus': { hour: 10, minute: 6 },
-    'Gemini': { hour: 15, minute: 9 },
-    'Cancer': { hour: 20, minute: 12 },
-    'Leo': { hour: 25, minute: 15 },
-    'Virgo': { hour: 30, minute: 18 },
-    'Libra': { hour: 35, minute: 21 },
-    'Scorpio': { hour: 40, minute: 24 },
-    'Sagittarius': { hour: 45, minute: 27 },
-    'Capricorn': { hour: 50, minute: 30 },
-    'Aquarius': { hour: 55, minute: 33 },
-    'Pisces': { hour: 60, minute: 36 }
+    'Aries': { hour: 2, minute: 1 },
+    'Taurus': { hour: 4, minute: 2 },
+    'Gemini': { hour: 6, minute: 3 },
+    'Cancer': { hour: 8, minute: 4 },
+    'Leo': { hour: 10, minute: 5 },
+    'Virgo': { hour: 12, minute: 6 },
+    'Libra': { hour: 14, minute: 7 },
+    'Scorpio': { hour: 16, minute: 8 },
+    'Sagittarius': { hour: 18, minute: 9 },
+    'Capricorn': { hour: 20, minute: 10 },
+    'Aquarius': { hour: 22, minute: 11 },
+    'Pisces': { hour: 24, minute: 12 }
   }[zodiacSign] || { hour: 0, minute: 0 };
 
-  // Apply zodiac and other influences
-  const finalHourRotation = (hourRotation + zodiacInfluence.hour) % 360;
-  const finalMinuteRotation = (minuteRotation + zodiacInfluence.minute) % 360;
-
-  return { 
-    hourRotation: finalHourRotation, 
-    minuteRotation: finalMinuteRotation 
+  return {
+    hourRotation: (hourRotation + zodiacInfluence.hour) % 360,
+    minuteRotation: (minuteRotation + zodiacInfluence.minute) % 360
   };
 }

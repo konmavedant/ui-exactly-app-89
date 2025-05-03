@@ -77,7 +77,6 @@ const RuneClock: React.FC = () => {
   );
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
-  const [seconds, setSeconds] = useState<number>(0);
   const [timezone, setTimezone] = useState<string>("America/Chicago");
   const [searchInput, setSearchInput] = useState<string>("");
   const navigate = useNavigate();
@@ -85,15 +84,11 @@ const RuneClock: React.FC = () => {
   useEffect(() => {
     const updateTime = async () => {
       try {
-        // Get coordinates from location
         const { lat, lng } = await getLatLngFromLocation(location_);
-        
-        // Get local time for coordinates
         const timeData = await getLocalTime(lat, lng);
         const [datePart, timePart] = timeData.time.split(' ');
         const [hours, minutes] = timePart.split(':').map(Number);
         
-        // Format time for display
         const formattedTime = format(
           new Date().setHours(hours, minutes), 
           'hh:mm a'
@@ -107,10 +102,22 @@ const RuneClock: React.FC = () => {
       }
     };
 
+    // Initial update
     updateTime();
-    const intervalId = setInterval(updateTime, 60000); // Update every minute
 
-    return () => clearInterval(intervalId);
+    // Update every minute, aligned to the start of the minute
+    const now = new Date();
+    const delay = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    
+    // Initial timeout to align with the start of the next minute
+    const alignmentTimeout = setTimeout(() => {
+      updateTime();
+      // Then set up the regular interval
+      const intervalId = setInterval(updateTime, 60000);
+      return () => clearInterval(intervalId);
+    }, delay);
+
+    return () => clearTimeout(alignmentTimeout);
   }, [location_]);
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
