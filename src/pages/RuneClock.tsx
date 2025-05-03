@@ -163,9 +163,8 @@ const RuneClock: React.FC = () => {
     'Aquarius': [120, 218],
     'Pisces': [219, 320]
   };
-          };
 
-          const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
+  const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
             if (start > end) {
               return monthDay >= start || monthDay <= end;
             }
