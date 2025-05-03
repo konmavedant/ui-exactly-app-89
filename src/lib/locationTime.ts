@@ -26,14 +26,26 @@ export async function getLatLngFromLocation(location: string): Promise<GeoLocati
 }
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
-  const GEONAMES_USERNAME = import.meta.env.VITE_GEONAMES_USERNAME;
-  const url = `http://api.geonames.org/timezoneJSON?lat=${lat}&lng=${lng}&username=${GEONAMES_USERNAME}`;
-  
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const GEONAMES_USERNAME = import.meta.env.VITE_GEONAMES_USERNAME;
+    const url = `https://secure.geonames.org/timezoneJSON?lat=${lat}&lng=${lng}&username=${GEONAMES_USERNAME}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
 
-  if (data.time) {
+    if (!data.time) {
+      throw new Error("Time data not available");
+    }
+
     return data;
+  } catch (error) {
+    console.error("Error fetching time:", error);
+    // Return current time as fallback
+    return {
+      time: new Date().toISOString(),
+      timezone: {
+        gmtOffset: 0
+      }
+    };
   }
-  throw new Error("Time not found for coordinates");
 }
