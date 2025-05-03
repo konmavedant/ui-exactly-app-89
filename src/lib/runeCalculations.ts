@@ -1,5 +1,4 @@
 
-import { formatInTimeZone } from 'date-fns-tz';
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 
 interface RuneTimeInfluence {
@@ -7,8 +6,8 @@ interface RuneTimeInfluence {
   minuteRotation: number;
 }
 
-// Helper function to get zodiac entry dates
-const getZodiacEntryDates = () => ({
+// Zodiac entry dates according to Sun enters dates
+const zodiacEntryDates = {
   'Aries': { month: 3, day: 21 },
   'Taurus': { month: 4, day: 15 },
   'Gemini': { month: 5, day: 15 },
@@ -21,7 +20,7 @@ const getZodiacEntryDates = () => ({
   'Capricorn': { month: 12, day: 16 },
   'Aquarius': { month: 1, day: 14 },
   'Pisces': { month: 2, day: 13 }
-});
+};
 
 export function calculateRuneTime(
   hours: number,
@@ -31,53 +30,46 @@ export function calculateRuneTime(
   dateOfBirth?: Date
 ): RuneTimeInfluence {
   const now = new Date();
-  const [lat, lng] = [41.8781, -87.6298]; // Default to Chicago if location coords not available
+  const [lat, lng] = [51.5074, -0.1278]; // Default coordinates (should be replaced with actual location)
 
   // Get sunrise and sunset times
-  const sunrise = getSunrise(lat, lng);
-  const sunset = getSunset(lat, lng);
+  const sunrise = getSunrise(lat, lng, now);
+  const sunset = getSunset(lat, lng, now);
 
-  // Calculate day length in minutes
-  const dayLength = (sunset.getTime() - sunrise.getTime()) / (1000 * 60);
+  // Convert current time to minutes since midnight
+  const currentMinutes = hours * 60 + minutes;
+  const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
+  const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
+
+  // Calculate day length and night length in minutes
+  const dayLength = sunsetMinutes - sunriseMinutes;
   const nightLength = 24 * 60 - dayLength;
 
-  // Calculate if current time is during day or night
-  const currentTime = now.getTime();
-  const isDaytime = currentTime >= sunrise.getTime() && currentTime <= sunset.getTime();
-
-  // Calculate hour rotation based on day/night position
+  // Calculate hour hand rotation
   let hourRotation;
-  if (isDaytime) {
-    // Day hours (lower 12 runes)
-    const minutesSinceSunrise = (currentTime - sunrise.getTime()) / (1000 * 60);
-    hourRotation = (minutesSinceSunrise / dayLength) * 180; // 180 degrees for day hours
+  if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+    // Day time - lower half (0-180 degrees)
+    const dayProgress = (currentMinutes - sunriseMinutes) / dayLength;
+    hourRotation = dayProgress * 180;
   } else {
-    // Night hours (upper 12 runes)
-    const minutesIntoNight = currentTime < sunrise.getTime() 
-      ? (currentTime - (sunrise.getTime() - nightLength * 60 * 1000)) / (1000 * 60)
-      : (currentTime - sunset.getTime()) / (1000 * 60);
-    hourRotation = 180 + (minutesIntoNight / nightLength) * 180; // 180-360 degrees for night hours
+    // Night time - upper half (180-360 degrees)
+    let nightProgress;
+    if (currentMinutes > sunsetMinutes) {
+      nightProgress = (currentMinutes - sunsetMinutes) / nightLength;
+    } else {
+      nightProgress = (currentMinutes + (24 * 60 - sunsetMinutes)) / nightLength;
+    }
+    hourRotation = 180 + (nightProgress * 180);
   }
 
-  // Calculate zodiac-based rotation (small arm)
-  const zodiacDates = getZodiacEntryDates();
-  const currentZodiac = Object.entries(zodiacDates).find(([sign, date]) => {
-    const zodiacDate = new Date(now.getFullYear(), date.month - 1, date.day);
-    const nextDate = Object.values(zodiacDates)[Object.keys(zodiacDates).indexOf(sign) + 1] 
-      || { month: 1, day: 14 }; // Default to next year's Aquarius if at end
-    const nextZodiacDate = new Date(
-      nextDate.month === 1 ? now.getFullYear() + 1 : now.getFullYear(),
-      nextDate.month - 1,
-      nextDate.day
-    );
-    return now >= zodiacDate && now < nextZodiacDate;
-  });
-
-  // Calculate the angle based on current zodiac position
-  const minuteRotation = (Object.keys(zodiacDates).indexOf(zodiacSign) / 12) * 360;
+  // Calculate zodiac-based rotation for small arm
+  const zodiacAngles = Object.keys(zodiacEntryDates).reduce((acc, sign, index) => {
+    acc[sign] = (index * 30) % 360; // Each zodiac sign gets 30 degrees
+    return acc;
+  }, {} as Record<string, number>);
 
   return {
     hourRotation: hourRotation % 360,
-    minuteRotation: minuteRotation
+    minuteRotation: zodiacAngles[zodiacSign] || 0
   };
 }
