@@ -113,27 +113,41 @@ const RuneClock: React.FC = () => {
     return () => clearInterval(intervalId);
   }, [location_]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = event.target.value.toLowerCase();
+  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = event.target.value;
     setSearchInput(searchValue);
+  };
 
-    if (searchValue.length > 2) {
+  const handleSearchSubmit = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && searchInput.length > 2) {
       try {
-        const timezones = getTimeZones();
-        const matchingTimezone = timezones.find(tz => 
-          tz.name.toLowerCase().includes(searchValue) ||
-          tz.mainCities.some(city => city.toLowerCase().includes(searchValue))
-        );
+        // Get coordinates from location name
+        const { lat, lng } = await getLatLngFromLocation(searchInput);
+        
+        // Get local time for coordinates
+        const timeData = await getLocalTime(lat, lng);
+        
+        // Update location and time
+        const [datePart, timePart] = timeData.time.split(' ');
+        const [hours, minutes] = timePart.split(':').map(Number);
+        
+        setLocation(searchInput);
+        setHours(hours);
+        setMinutes(minutes);
+        setCurrentTime(format(new Date().setHours(hours, minutes), 'hh:mm a'));
+        
+        // Clear search input and blur the input field
+        setSearchInput('');
+        event.currentTarget.blur();
+      } catch (error) {
+        console.error('Error fetching location time:', error);
+      }
+    }
+  };
 
-        if (matchingTimezone) {
-          const cityName = matchingTimezone.mainCities[0] || matchingTimezone.name.split('/').pop()?.replace(/_/g, ' ');
-          setLocation(cityName || searchValue);
-          setCountry(matchingTimezone.continentName);
-          setTimezone(matchingTimezone.name);
-
-          const currentDate = new Date();
-          const monthDay = parseInt(format(currentDate, 'Mdd'));
-          const zodiacSigns = {
+  const handleSearchBlur = () => {
+    setSearchInput('');
+  };
             'Aries': [321, 419],
             'Taurus': [420, 520],
             'Gemini': [521, 620],
@@ -245,8 +259,9 @@ const RuneClock: React.FC = () => {
             placeholder="Search location..."
             onChange={handleSearchChange}
             value={searchInput}
-            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+            onKeyDown={handleSearchSubmit}
             onFocus={(e) => e.currentTarget.select()}
+            onBlur={handleSearchBlur}
           />
         </div>
         {searchInput && (
