@@ -14,6 +14,7 @@ interface GeoLocation {
 export async function getLatLngFromLocation(location: string): Promise<GeoLocation> {
   const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
   if (!OPENCAGE_API_KEY) {
+    console.error("OpenCage API key is missing. Please check your environment variables.");
     throw new Error("OpenCage API key not found");
   }
   
@@ -32,6 +33,7 @@ export async function getLatLngFromLocation(location: string): Promise<GeoLocati
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
   const TIMEZONE_API_KEY = import.meta.env.VITE_TIMEZONE_API_KEY;
   if (!TIMEZONE_API_KEY) {
+    console.error("TimeZoneDB API key is missing. Please check your environment variables.");
     throw new Error("TimeZoneDB API key not found");
   }
 
