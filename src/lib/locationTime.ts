@@ -27,22 +27,27 @@ export async function getLatLngFromLocation(location: string): Promise<GeoLocati
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
   try {
-    const GEONAMES_USERNAME = import.meta.env.VITE_GEONAMES_USERNAME;
-    const url = `https://secure.geonames.org/timezoneJSON?lat=${lat}&lng=${lng}&username=${GEONAMES_USERNAME}`;
+    // Use TimeZoneDB API for more reliable timezone data
+    const TIMEZONE_API_KEY = import.meta.env.VITE_TIMEZONE_API_KEY;
+    const url = `https://api.timezonedb.com/v2.1/get-time-zone?key=${TIMEZONE_API_KEY}&format=json&by=position&lat=${lat}&lng=${lng}`;
     
     const response = await fetch(url);
     const data = await response.json();
 
-    if (!data.time) {
-      throw new Error("Time data not available");
+    if (data.status === 'OK') {
+      return {
+        time: new Date(data.formatted).toLocaleString(),
+        timezone: {
+          gmtOffset: data.gmtOffset
+        }
+      };
     }
-
-    return data;
+    throw new Error("Time data not available");
   } catch (error) {
     console.error("Error fetching time:", error);
     // Return current time as fallback
     return {
-      time: new Date().toISOString(),
+      time: new Date().toLocaleString(),
       timezone: {
         gmtOffset: 0
       }
