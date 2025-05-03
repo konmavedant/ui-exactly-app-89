@@ -45,12 +45,18 @@ export function calculateRuneTime(
   const dayLength = sunsetMinutes - sunriseMinutes;
   const nightLength = 24 * 60 - dayLength;
 
-  // Calculate hour hand rotation
-  let hourRotation;
+  // Calculate zodiac-based rotation for hour hand
+  const zodiacAngles = Object.keys(zodiacEntryDates).reduce((acc, sign, index) => {
+    acc[sign] = (index * 30) % 360; // Each zodiac sign gets 30 degrees
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Calculate minute hand rotation based on day/night
+  let minuteRotation;
   if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
     // Day time - lower half (0-180 degrees)
     const dayProgress = (currentMinutes - sunriseMinutes) / dayLength;
-    hourRotation = dayProgress * 180;
+    minuteRotation = dayProgress * 180;
   } else {
     // Night time - upper half (180-360 degrees)
     let nightProgress;
@@ -59,17 +65,11 @@ export function calculateRuneTime(
     } else {
       nightProgress = (currentMinutes + (24 * 60 - sunsetMinutes)) / nightLength;
     }
-    hourRotation = 180 + (nightProgress * 180);
+    minuteRotation = 180 + (nightProgress * 180);
   }
 
-  // Calculate zodiac-based rotation for small arm
-  const zodiacAngles = Object.keys(zodiacEntryDates).reduce((acc, sign, index) => {
-    acc[sign] = (index * 30) % 360; // Each zodiac sign gets 30 degrees
-    return acc;
-  }, {} as Record<string, number>);
-
   return {
-    hourRotation: hourRotation % 360,
-    minuteRotation: zodiacAngles[zodiacSign] || 0
+    hourRotation: zodiacAngles[zodiacSign] || 0,
+    minuteRotation: minuteRotation % 360
   };
 }
