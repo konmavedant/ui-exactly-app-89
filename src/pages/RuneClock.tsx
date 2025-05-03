@@ -86,11 +86,12 @@ const RuneClock: React.FC = () => {
       try {
         const { lat, lng } = await getLatLngFromLocation(location_);
         const timeData = await getLocalTime(lat, lng);
-        const [datePart, timePart] = timeData.time.split(' ');
-        const [hours, minutes] = timePart.split(':').map(Number);
+        const timeDate = new Date(timeData.time);
+        const hours = timeDate.getHours();
+        const minutes = timeDate.getMinutes();
         
         const formattedTime = format(
-          new Date().setHours(hours, minutes), 
+          timeDate,
           'hh:mm a'
         );
 
