@@ -149,6 +149,12 @@ const RuneClock: React.FC = () => {
     setSearchInput('');
   };
 
+  const getMonthDay = (date: Date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return month * 100 + day;
+  };
+
   const zodiacDates = {
     'Aries': [321, 419],
     'Taurus': [420, 520],
@@ -164,20 +170,17 @@ const RuneClock: React.FC = () => {
     'Pisces': [219, 320]
   };
 
-  const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
-            if (start > end) {
-              return monthDay >= start || monthDay <= end;
-            }
-            return monthDay >= start && monthDay <= end;
-          });
-
-          setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
-        }
-      } catch (error) {
-        console.error('Error fetching timezone data:', error);
+  useEffect(() => {
+    const monthDay = getMonthDay(new Date());
+    const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
+      if (start > end) {
+        return monthDay >= start || monthDay <= end;
       }
-    }
-  };
+      return monthDay >= start && monthDay <= end;
+    });
+    
+    setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
+  }, []);
 
   const dateOfBirth = location.state?.dateOfBirth ? new Date(location.state.dateOfBirth) : undefined;
   const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
