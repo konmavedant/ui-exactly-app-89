@@ -11,47 +11,32 @@ export function calculateRuneTime(
   location: string,
   dateOfBirth?: Date
 ): RuneTimeInfluence {
-  // Base rotation calculations
-  const baseHourRotation = (hours % 12) * 30 + minutes * 0.5;
-  const baseMinuteRotation = minutes * 6;
+  // Calculate base angles using 24-hour format
+  const minuteRotation = (minutes / 60) * 360; // 6° per minute
+  const hourRotation = ((hours % 24) + minutes / 60) * 15; // 15° per hour
 
-  // Zodiac influence calculations
+  // Zodiac influence (reduced effect)
   const zodiacInfluence = {
-    'Aries': { hour: 15, minute: 10 },
-    'Taurus': { hour: 30, minute: 20 },
-    'Gemini': { hour: 45, minute: 30 },
-    'Cancer': { hour: 60, minute: 40 },
-    'Leo': { hour: 75, minute: 50 },
-    'Virgo': { hour: 90, minute: 60 },
-    'Libra': { hour: 105, minute: 70 },
-    'Scorpio': { hour: 120, minute: 80 },
-    'Sagittarius': { hour: 135, minute: 90 },
-    'Capricorn': { hour: 150, minute: 100 },
-    'Aquarius': { hour: 165, minute: 110 },
-    'Pisces': { hour: 180, minute: 120 }
+    'Aries': { hour: 5, minute: 3 },
+    'Taurus': { hour: 10, minute: 6 },
+    'Gemini': { hour: 15, minute: 9 },
+    'Cancer': { hour: 20, minute: 12 },
+    'Leo': { hour: 25, minute: 15 },
+    'Virgo': { hour: 30, minute: 18 },
+    'Libra': { hour: 35, minute: 21 },
+    'Scorpio': { hour: 40, minute: 24 },
+    'Sagittarius': { hour: 45, minute: 27 },
+    'Capricorn': { hour: 50, minute: 30 },
+    'Aquarius': { hour: 55, minute: 33 },
+    'Pisces': { hour: 60, minute: 36 }
   }[zodiacSign] || { hour: 0, minute: 0 };
 
-  // Location hemisphere influence
-  const isNorthern = !location.toLowerCase().includes('south');
-  const hemisphereMultiplier = isNorthern ? 1 : -1;
+  // Apply zodiac and other influences
+  const finalHourRotation = (hourRotation + zodiacInfluence.hour) % 360;
+  const finalMinuteRotation = (minuteRotation + zodiacInfluence.minute) % 360;
 
-  // Birth date influence (if available)
-  const birthDateInfluence = dateOfBirth ? 
-    Math.sin(dateOfBirth.getTime() / (1000 * 60 * 60 * 24 * 365.25) * Math.PI) * 15 : 
-    0;
-
-  // Calculate final rotations
-  const hourRotation = (
-    baseHourRotation + 
-    (zodiacInfluence.hour / 12) * hemisphereMultiplier +
-    birthDateInfluence
-  ) % 360;
-
-  const minuteRotation = (
-    baseMinuteRotation + 
-    (zodiacInfluence.minute / 60) * hemisphereMultiplier +
-    birthDateInfluence * 0.5
-  ) % 360;
-
-  return { hourRotation, minuteRotation };
+  return { 
+    hourRotation: finalHourRotation, 
+    minuteRotation: finalMinuteRotation 
+  };
 }
