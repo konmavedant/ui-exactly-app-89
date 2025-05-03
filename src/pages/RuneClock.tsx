@@ -148,18 +148,21 @@ const RuneClock: React.FC = () => {
   const handleSearchBlur = () => {
     setSearchInput('');
   };
-            'Aries': [321, 419],
-            'Taurus': [420, 520],
-            'Gemini': [521, 620],
-            'Cancer': [621, 722],
-            'Leo': [723, 822],
-            'Virgo': [823, 922],
-            'Libra': [923, 1022],
-            'Scorpio': [1023, 1121],
-            'Sagittarius': [1122, 1221],
-            'Capricorn': [1222, 119],
-            'Aquarius': [120, 218],
-            'Pisces': [219, 320]
+
+  const zodiacDates = {
+    'Aries': [321, 419],
+    'Taurus': [420, 520],
+    'Gemini': [521, 620],
+    'Cancer': [621, 722],
+    'Leo': [723, 822],
+    'Virgo': [823, 922],
+    'Libra': [923, 1022],
+    'Scorpio': [1023, 1121],
+    'Sagittarius': [1122, 1221],
+    'Capricorn': [1222, 119],
+    'Aquarius': [120, 218],
+    'Pisces': [219, 320]
+  };
           };
 
           const currentZodiac = Object.entries(zodiacSigns).find(([_, [start, end]]) => {
