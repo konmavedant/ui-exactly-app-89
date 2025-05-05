@@ -36,10 +36,7 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  let now = dateObj ? new Date(dateObj) : new Date();
-  if (!now || isNaN(now.getTime())) {
-    now = new Date();
-  }
+  const now = new Date('2025-05-05T14:40:00');  // Fixed date for May 5, 2025 at 2:40 PM
 
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 

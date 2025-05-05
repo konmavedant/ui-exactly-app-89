@@ -179,16 +179,19 @@ const RuneClock: React.FC = () => {
   };
 
   useEffect(() => {
-    const monthDay = getMonthDay(new Date());
-    const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
-      if (start > end) {
-        return monthDay >= start || monthDay <= end;
-      }
-      return monthDay >= start && monthDay <= end;
-    });
-    
-    setZodiacSign('Aries'); // Fixed for May 5, 2025
-  }, []);
+    if (location.state?.dateOfBirth) {
+      const birthDate = new Date(location.state.dateOfBirth);
+      const monthDay = getMonthDay(birthDate);
+      const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
+        if (start > end) {
+          return monthDay >= start || monthDay <= end;
+        }
+        return monthDay >= start && monthDay <= end;
+      });
+      
+      setZodiacSign(currentZodiac ? currentZodiac[0] : 'Aries');
+    }
+  }, [location.state?.dateOfBirth]);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
   const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
