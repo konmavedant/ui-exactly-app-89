@@ -1,4 +1,3 @@
-
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 
 interface RuneTimeInfluence {
@@ -33,10 +32,15 @@ const locationCoordinates: Record<string, [number, number]> = {
 export function calculateRuneTime(
   hours: number,
   minutes: number,
+  zodiacSign: string,
   location: string,
-  date?: Date
+  dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  const now = date || new Date();
+  const now = dateObj ? new Date(dateObj) : new Date();
+  if (isNaN(now.getTime())) {
+    // If date is invalid, use current date
+    now = new Date();
+  }
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
   // Get sunrise and sunset times for the specified date and location
@@ -112,7 +116,7 @@ export function calculateRuneTime(
       const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
       const daysPassed = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
       const progressInSign = daysPassed / totalDays;
-      
+
       // Calculate rotation starting from 12 o'clock position
       minuteRotation = (i * 30) + (progressInSign * 30); // 30° per zodiac sign
       break;

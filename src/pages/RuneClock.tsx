@@ -190,7 +190,7 @@ const RuneClock: React.FC = () => {
     setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
   }, []);
 
-  const dateOfBirth = location.state?.dateOfBirth ? new Date(location.state.dateOfBirth) : undefined;
+  const dateOfBirth = location.state?.dateOfBirth || null;
   const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
 
   return (
