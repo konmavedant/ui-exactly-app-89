@@ -55,14 +55,15 @@ export function calculateRuneTime(
   const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
   const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
 
-  // Fixed Big Arm (Hour hand) calculation to match the specified angle
-  let hourRotation = 210.9; // Set to the correct angle for May 5, 2025 at 2:40 PM
+  // Calculate Big Arm (Hour hand) rotation based on current time
+  // 24 hour cycle = 360 degrees
+  const hourRotation = ((hours % 24) * 360 / 24) + (minutes * 360 / (24 * 60));
   
-  // Small Arm (Zodiac) calculation
+  // Calculate Small Arm (Zodiac) rotation based on current date
   const month = now.getMonth() + 1;
   const day = now.getDate();
-  let minuteRotation = 20.31; // Set to the correct angle for Aries on May 5, 2025
-
+  let minuteRotation = 0;
+  
   // Find current zodiac period
   for (let i = 0; i < zodiacPeriods.length; i++) {
     const currentPeriod = zodiacPeriods[i];
