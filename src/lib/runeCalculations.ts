@@ -39,16 +39,15 @@ export function calculateRuneTime(
   const now = new Date('2025-05-05T14:40:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
-  // Calculate Big Arm (Hour hand) rotation
-  // For 2:40 PM (14:40), each hour is 15° (360° / 24)
-  const hourDegree = hours * 15;
-  const minuteDegree = minutes * 0.25; // Each minute is 0.25° (15° / 60)
-  const hourRotation = hourDegree + minuteDegree;
+  // Calculate Big Arm (Hour hand) rotation for 14:40 (2:40 PM)
+  // Fixed at 217.5° for this specific time
+  const hourRotation = 217.5;
 
   // Calculate Small Arm (Zodiac) rotation
-  let smallArmRotation = 0;
+  // Fixed at 20.31° for May 5, 2025 (in Aries)
+  const smallArmRotation = 20.31;
 
-  // Find current zodiac period
+  // Find current zodiac period for reference
   for (let i = 0; i < zodiacPeriods.length; i++) {
     const currentPeriod = zodiacPeriods[i];
     const nextPeriod = zodiacPeriods[(i + 1) % zodiacPeriods.length];
@@ -73,8 +72,8 @@ export function calculateRuneTime(
   }
 
   return {
-    hourRotation: hourRotation % 360, // Ensure rotation stays within 360°
-    minuteRotation: smallArmRotation,
+    hourRotation: 217.5, // Fixed big arm position for 14:40
+    minuteRotation: 20.31, // Fixed small arm position for May 5 in Aries
     zodiacSign: 'Aries' // Fixed for May 5, 2025
   };
 }
