@@ -126,7 +126,6 @@ export async function calculateRuneTime(
   const daysPassed = 21;
   const progressInSign = daysPassed / daysInSign;
   const baseRotation = 0; // Aries starts at 0°
-  const [lat, lng] = locationCoordinates[location] || locationCoordinates['Mumbai'];
   const astrologyData = await getAstrologyData(now, lat, lng);
   
   let minuteRotation = baseRotation + (progressInSign * 30);
