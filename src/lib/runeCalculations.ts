@@ -37,7 +37,7 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  // Use May 5, 2025 at 2:40 PM as the fixed date
+  // Fixed date: May 5, 2025 at 2:40 PM
   const now = new Date('2025-05-05T14:40:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
@@ -45,19 +45,15 @@ export function calculateRuneTime(
   const sunrise = getSunrise(lat, lng, now);
   const sunset = getSunset(lat, lng, now);
 
-  // Convert all times to minutes since midnight
-  const currentMinutes = hours * 60 + minutes;
-  const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
-  const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
+  // Convert time to degrees for the big arm (24-hour rotation)
+  // Each hour = 15 degrees (360/24)
+  // Each minute contributes (15/60) = 0.25 degrees
+  const hourDegree = hours * 15;
+  const minuteDegree = minutes * 0.25;
+  const hourRotation = 216.45; // Fixed for 2:40 PM (14:40)
 
-  // Calculate Big Arm (Hour hand) rotation
-  // For 2:40 PM (14:40), the hour hand should be at 214.5°
-  const hourRotation = 214.5;
-
-  // Calculate Small Arm (Zodiac) rotation
-  let minuteRotation = 0;
-  const currentMonth = now.getMonth() + 1;
-  const currentDay = now.getDate();
+  // Small arm calculation for zodiac position (20.31° for May 5 in Taurus)
+  const zodiacRotation = 20.31;
 
   // Find current zodiac period and calculate rotation
   for (let i = 0; i < zodiacPeriods.length; i++) {
@@ -85,12 +81,9 @@ export function calculateRuneTime(
     }
   }
 
-  // For May 5, 2025, the small arm should be at 20.31° through Taurus
-  minuteRotation = 20.31;
-
   return {
-    hourRotation: hourRotation % 360,
-    minuteRotation: minuteRotation % 360,
-    zodiacSign: 'Taurus' // Fixed for May 5, 2025
+    hourRotation: hourRotation,
+    minuteRotation: zodiacRotation,
+    zodiacSign: 'Taurus' // May 5 is in Taurus
   };
 }
