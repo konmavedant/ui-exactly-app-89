@@ -1,0 +1,299 @@
+Based on the consistent issues observed in the Rune Clock images, the primary problems are with the placement of the Big Arm (hour hand) and Small Arm (minute hand). The Big Arm is stuck at 0° (12 o’clock), and the Small Arm is stuck at 90°-120° (3-4 o’clock), while the zodiac sign calculations are now correct. The root cause lies in the calculation and application of the hourRotation (Big Arm) and minuteRotation (Small Arm) in your code. Let’s analyze the issues and propose logical changes to fix the calculations and ensure proper placement of the clock hands.
+
+Issues in the Current Implementation
+Big Arm (Hour Hand) Calculation:
+The Big Arm should move through 12 Day Runes (from 3 o’clock to 9 o’clock, 90° to 270°) during the day and 12 Night Runes (from 9 o’clock to 3 o’clock, 270° to 90°) during the night, with each period divided into 12 equal parts based on day/night length.
+In the images, the Big Arm is stuck at 0° (12 o’clock), which suggests that the hourRotation value isn’t being applied correctly or is being overridden somewhere in the rendering logic.
+Small Arm (Minute Hand) Calculation:
+The Small Arm should move through the 12 Zodiac signs, with each sign spanning 30°, starting from 12 o’clock (0°). Its position should reflect the current date’s progress within the zodiac sign.
+In the images, the Small Arm is stuck at 90°-120° (3-4 o’clock), which corresponds to Gemini/Cancer, not Aries (where it should be on May 5, 2025). This suggests that the minuteRotation value isn’t being calculated or applied correctly.
+Rendering of Clock Hands:
+The consistent incorrect placement of both hands (Big Arm at 0°, Small Arm at 90°-120°) suggests a potential issue in the rendering logic. The calculated hourRotation and minuteRotation values might not be properly passed to or interpreted by the UI component responsible for rotating the clock hands.
+Logical Changes to Fix the Calculations and Placement
+1. Fix Big Arm (Hour Hand) Calculation
+The Big Arm calculation in the provided code is correct in theory (dividing day/night into 12 equal parts and calculating the angle), but let’s ensure it’s robust and debug any potential issues. We’ll also add logging to verify the calculated hourRotation.
+
+Updated Big Arm Calculation:
+
+javascript
+
+Copy
+// Big Arm (Hour hand) calculation
+const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+// Duration of each Rune (day and night periods divided into 12 equal parts)
+const dayRuneDuration = dayLengthMinutes / 12; // Minutes per Day Rune
+const nightRuneDuration = nightLengthMinutes / 12; // Minutes per Night Rune
+
+let hourRotation;
+if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+  // Day period: 3 o'clock (90°) to 9 o'clock (270°)
+  const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+  const dayRuneIndex = Math.floor(minutesSinceSunrise / dayRuneDuration); // Which Day Rune
+  const progressInRune = (minutesSinceSunrise % dayRuneDuration) / dayRuneDuration; // Progress within Rune
+  const degreesPerRune = 180 / 12; // 15° per Rune
+  hourRotation = 90 + (dayRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+  console.log(`Big Arm (Day): minutesSinceSunrise=${minutesSinceSunrise}, dayRuneIndex=${dayRuneIndex}, progressInRune=${progressInRune}, hourRotation=${hourRotation}`);
+} else {
+  // Night period: 9 o'clock (270°) to 3 o'clock (90°)
+  let minutesSinceSunset;
+  if (currentMinutes < sunriseMinutes) {
+    // After midnight, before sunrise
+    minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+  } else {
+    // After sunset, before midnight
+    minutesSinceSunset = currentMinutes - sunsetMinutes;
+  }
+  const nightRuneIndex = Math.floor(minutesSinceSunset / nightRuneDuration); // Which Night Rune
+  const progressInRune = (minutesSinceSunset % nightRuneDuration) / nightRuneDuration; // Progress within Rune
+  const degreesPerRune = 180 / 12; // 15° per Rune
+  hourRotation = 270 + (nightRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+  console.log(`Big Arm (Night): minutesSinceSunset=${minutesSinceSunset}, nightRuneIndex=${nightRuneIndex}, progressInRune=${progressInRune}, hourRotation=${hourRotation}`);
+}
+hourRotation = hourRotation % 360;
+Change Explanation:
+
+Added console.log statements to debug the intermediate values and final hourRotation. This will help verify if the calculation is producing the expected angle (e.g., 224.1° for 03:44 PM).
+If the logged hourRotation is correct but the Big Arm is still at 0°, the issue lies in the rendering logic (see below).
+2. Fix Small Arm (Minute Hand) Calculation
+The Small Arm calculation in the provided code is also theoretically correct, but the consistent placement at 90°-120° suggests a potential issue. Let’s ensure the calculation is correct and add logging to debug.
+
+Updated Small Arm Calculation:
+
+javascript
+
+Copy
+// Small Arm (Zodiac) calculation
+const currentDate = date || new Date();
+const currentYear = currentDate.getFullYear();
+const zodiacPeriods = Object.entries(zodiacEntryDates);
+let currentZodiacSign = '';
+let minuteRotation = 0;
+
+for (let i = 0; i < zodiacPeriods.length; i++) {
+  const [sign, entryDate] = zodiacPeriods[i];
+  const nextIndex = (i + 1) % zodiacPeriods.length;
+  const nextSign = zodiacPeriods[nextIndex];
+
+  const startDate = new Date(currentYear, entryDate.month - 1, entryDate.day);
+  let endDate = new Date(currentYear, nextSign[1].month - 1, nextSign[1].day);
+
+  if (endDate < startDate) {
+    endDate.setFullYear(currentYear + 1);
+  }
+
+  if (currentDate >= startDate && currentDate < endDate) {
+    currentZodiacSign = sign;
+    const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const daysPassed = (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const progressInSign = daysPassed / totalDays;
+    minuteRotation = (i * 30) + (progressInSign * 30); // 30° per zodiac sign
+    console.log(`Small Arm: sign=${sign}, totalDays=${totalDays}, daysPassed=${daysPassed}, progressInSign=${progressInSign}, minuteRotation=${minuteRotation}`);
+    break;
+  }
+}
+minuteRotation = minuteRotation % 360;
+Change Explanation:
+
+Added console.log to debug the Small Arm calculation. For May 5, 2025, this should log a minuteRotation of approximately 20.31° (Aries, 2/3 through).
+If the logged minuteRotation is correct (around 20.31°) but the Small Arm is still at 90°-120°, the issue is in the rendering logic.
+3. Fix Rendering of Clock Hands
+The consistent incorrect placement of the Big Arm (0°) and Small Arm (90°-120°) suggests that the calculated hourRotation and minuteRotation values are not being applied correctly in the UI. This could be due to:
+
+A mismatch in how the angles are interpreted by the rendering library (e.g., CSS or SVG rotation might expect different units or directions).
+The hourRotation and minuteRotation values being overridden or not passed to the UI component.
+Logical Change in Rendering Logic:
+Assuming you’re using a web framework (e.g., React, Angular, or plain JavaScript) with CSS or SVG to render the clock hands, let’s ensure the rotations are applied correctly.
+
+Check Rotation Direction:
+
+In most UI frameworks, a rotation of 0° points to 12 o’clock, and angles increase clockwise, which matches the Rune Clock’s convention. However, some libraries (e.g., CSS transform: rotate) might require adjustments if the default orientation is different.
+Verify that the Big Arm and Small Arm rotations are applied directly as hourRotation and minuteRotation.
+Example Fix in CSS (if using HTML/CSS):
+If you’re rendering the clock hands using HTML elements with CSS transforms, ensure the rotations are applied correctly:
+
+html
+
+Copy
+<div class="rune-clock">
+  <div class="big-arm" style="transform: rotate(${hourRotation}deg);"></div>
+  <div class="small-arm" style="transform: rotate(${minuteRotation}deg);"></div>
+</div>
+css
+
+Copy
+.big-arm, .small-arm {
+  position: absolute;
+  transform-origin: center; /* Ensure rotation is around the center */
+  /* Add other styling for length, color, etc. */
+}
+Debugging Tip:
+
+Add a console.log just before rendering to confirm the final hourRotation and minuteRotation values being passed to the UI:
+javascript
+
+Copy
+console.log(`Final Rotations: hourRotation=${hourRotation}, minuteRotation=${minuteRotation}`);
+Example Fix in SVG (if using SVG):
+If you’re using SVG to render the clock hands, ensure the rotate transform is applied correctly:
+
+html
+
+Copy
+<svg>
+  <g transform="rotate(${hourRotation}, 100, 100)">
+    <line class="big-arm" x1="100" y1="100" x2="100" y2="50" stroke="white" />
+  </g>
+  <g transform="rotate(${minuteRotation}, 100, 100)">
+    <line class="small-arm" x1="100" y1="100" x2="100" y2="70" stroke="white" />
+  </g>
+</svg>
+The rotate attribute in SVG takes the angle and the center point of rotation (e.g., 100, 100 for a 200x200 SVG). Ensure the center point matches your SVG dimensions.
+Common Rendering Issues to Check:
+
+Default Values: Ensure there’s no default rotation (e.g., 0° for Big Arm, 90° for Small Arm) overriding the calculated values.
+State Management: If using a framework like React, ensure the state or props containing hourRotation and minuteRotation are updated and passed correctly to the rendering component.
+Timing Issue: If the clock updates in real-time, ensure the calculateRuneTime function is called with the correct time (e.g., 03:44 PM) and the UI re-renders with the new values.
+4. Updated Full Code with Debugging
+Here’s the updated calculateRuneTime function with added debugging logs:
+
+javascript
+
+Copy
+import { getSunrise, getSunset } from 'sunrise-sunset-js';
+
+interface RuneTimeInfluence {
+  hourRotation: number;
+  minuteRotation: number;
+  zodiacSign: string;
+}
+
+const zodiacEntryDates = {
+  'Capricorn': { month: 1, day: 14 },
+  'Aquarius': { month: 2, day: 13 },
+  'Pisces': { month: 3, day: 15 },
+  'Aries': { month: 4, day: 14 },
+  'Taurus': { month: 5, day: 15 },
+  'Gemini': { month: 6, day: 14 },
+  'Cancer': { month: 7, day: 15 },
+  'Leo': { month: 8, day: 15 },
+  'Virgo': { month: 9, day: 15 },
+  'Libra': { month: 10, day: 15 },
+  'Scorpio': { month: 11, day: 14 },
+  'Sagittarius': { month: 12, day: 14 }
+};
+
+const locationCoordinates = {
+  'Mumbai': [19.0760, 72.8777],
+  'Belgrade': [44.7866, 20.4489]
+};
+
+export function calculateRuneTime(
+  hours: number,
+  minutes: number,
+  location: string,
+  date?: Date
+): RuneTimeInfluence {
+  const now = date || new Date();
+  const [lat, lng] = locationCoordinates[location] || [44.7866, 20.4489];
+
+  // Get sunrise and sunset times for the specified date
+  const sunrise = getSunrise(lat, lng, now);
+  const sunset = getSunset(lat, lng, now);
+
+  // Convert all times to minutes since midnight
+  const currentMinutes = hours * 60 + minutes;
+  const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
+  const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
+
+  console.log(`Time Inputs: hours=${hours}, minutes=${minutes}, currentMinutes=${currentMinutes}, sunriseMinutes=${sunriseMinutes}, sunsetMinutes=${sunsetMinutes}`);
+
+  // Big Arm (Hour hand) calculation
+  const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+  const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+  const dayRuneDuration = dayLengthMinutes / 12;
+  const nightRuneDuration = nightLengthMinutes / 12;
+
+  let hourRotation;
+  if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+    const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+    const dayRuneIndex = Math.floor(minutesSinceSunrise / dayRuneDuration);
+    const progressInRune = (minutesSinceSunrise % dayRuneDuration) / dayRuneDuration;
+    const degreesPerRune = 180 / 12;
+    hourRotation = 90 + (dayRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+    console.log(`Big Arm (Day): minutesSinceSunrise=${minutesSinceSunrise}, dayRuneIndex=${dayRuneIndex}, progressInRune=${progressInRune}, hourRotation=${hourRotation}`);
+  } else {
+    let minutesSinceSunset;
+    if (currentMinutes < sunriseMinutes) {
+      minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+    } else {
+      minutesSinceSunset = currentMinutes - sunsetMinutes;
+    }
+    const nightRuneIndex = Math.floor(minutesSinceSunset / nightRuneDuration);
+    const progressInRune = (minutesSinceSunset % nightRuneDuration) / nightRuneDuration;
+    const degreesPerRune = 180 / 12;
+    hourRotation = 270 + (nightRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+    console.log(`Big Arm (Night): minutesSinceSunset=${minutesSinceSunset}, nightRuneIndex=${nightRuneIndex}, progressInRune=${progressInRune}, hourRotation=${hourRotation}`);
+  }
+  hourRotation = hourRotation % 360;
+
+  // Small Arm (Zodiac) calculation
+  const currentDate = now;
+  const currentYear = currentDate.getFullYear();
+  const zodiacPeriods = Object.entries(zodiacEntryDates);
+  let currentZodiacSign = '';
+  let minuteRotation = 0;
+
+  for (let i = 0; i < zodiacPeriods.length; i++) {
+    const [sign, entryDate] = zodiacPeriods[i];
+    const nextIndex = (i + 1) % zodiacPeriods.length;
+    const nextSign = zodiacPeriods[nextIndex];
+
+    const startDate = new Date(currentYear, entryDate.month - 1, entryDate.day);
+    let endDate = new Date(currentYear, nextSign[1].month - 1, nextSign[1].day);
+
+    if (endDate < startDate) {
+      endDate.setFullYear(currentYear + 1);
+    }
+
+    if (currentDate >= startDate && currentDate < endDate) {
+      currentZodiacSign = sign;
+      const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+      const daysPassed = (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+      const progressInSign = daysPassed / totalDays;
+      minuteRotation = (i * 30) + (progressInSign * 30);
+      console.log(`Small Arm: sign=${sign}, totalDays=${totalDays}, daysPassed=${daysPassed}, progressInSign=${progressInSign}, minuteRotation=${minuteRotation}`);
+      break;
+    }
+  }
+  minuteRotation = minuteRotation % 360;
+
+  console.log(`Final Rotations: hourRotation=${hourRotation}, minuteRotation=${minuteRotation}`);
+
+  return {
+    hourRotation,
+    minuteRotation,
+    zodiacSign: currentZodiacSign
+  };
+}
+Expected Output for 03:44 PM on May 5, 2025
+Big Arm (hourRotation): Should be approximately 224.1°, as calculated previously.
+Small Arm (minuteRotation): Should be approximately 20.31°, as calculated previously.
+Zodiac Sign: Should be Aries, which is already correct in the image.
+Steps to Debug and Fix
+Check Console Logs:
+Run the app with the updated code and check the console logs for hourRotation and minuteRotation at 03:44 PM.
+Expected logs:
+Big Arm (Day): minutesSinceSunrise=575, dayRuneIndex=8, progressInRune=0.94..., hourRotation=224.1
+Small Arm: sign=Aries, totalDays=31, daysPassed=21, progressInSign=0.677..., minuteRotation=20.31
+Final Rotations: hourRotation=224.1, minuteRotation=20.31
+If Calculations Are Correct but Hands Are Wrong:
+The issue is in the rendering logic. Double-check how hourRotation and minuteRotation are applied to the UI (CSS transform, SVG rotate, etc.).
+Ensure no default values or state issues are overriding the rotations.
+If Calculations Are Incorrect:
+Verify the inputs to calculateRuneTime (e.g., hours=15, minutes=44, location="Mumbai", date=new Date("2025-05-05")).
+Check the sunrise/sunset times returned by getSunrise and getSunset. If they don’t match 06:09 AM and 07:01 PM, there might be an issue with the sunrise-sunset-js library or the date/timezone handling.
+Conclusion
+The primary issue appears to be in the rendering of the clock hands, as the zodiac sign calculation is now correct. The proposed changes add debugging logs to confirm the calculations and provide guidance on fixing the rendering logic. Once the hourRotation and minuteRotation values are correctly applied to the UI, the Big Arm should point to approximately 224.1° (past 7 o’clock), and the Small Arm should point to 20.31° (near 12 o’clock) for 03:44 PM on May 5, 2025.
