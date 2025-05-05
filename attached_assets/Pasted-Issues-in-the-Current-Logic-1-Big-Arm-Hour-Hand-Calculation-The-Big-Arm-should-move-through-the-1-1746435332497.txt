@@ -1,0 +1,305 @@
+Issues in the Current Logic
+1. Big Arm (Hour Hand) Calculation
+The Big Arm should move through the 12 Day Runes (from 3 o’clock to 9 o’clock) and 12 Night Runes (from 9 o’clock to 3 o’clock), with each period divided into 12 equal parts. The current logic calculates day and night progress linearly, but it doesn’t account for dividing each period into 12 equal segments as per the rules. Additionally:
+
+The logic assumes a uniform 180° movement for both day and night, but since day and night lengths vary (e.g., longer days in summer), each Rune’s duration (in minutes) should be calculated and used to determine the exact Rune position.
+The night period calculation has a minor issue with angle wrapping (e.g., angles exceeding 360° should be handled consistently).
+2. Small Arm (Zodiac Hand) Calculation
+The Small Arm logic calculates the zodiac position, but there are issues:
+
+The zodiacEntryDates are hardcoded and don’t match the provided reference dates (e.g., Aries starts on April 14, 2025, not April 20; Taurus starts on May 15, not May 21). These should be dynamically fetched or corrected.
+The logic uses the current date to calculate zodiac progress but doesn’t account for user-provided dates or locations (e.g., the date in the image is May 5, 2025).
+The zodiacSign parameter is passed directly, which might not be reliable. It’s better to calculate the zodiac sign dynamically based on the date.
+3. Location and Date Handling
+The logic hardcodes Belgrade coordinates (lat, lng = [44.7866, 20.4489]), but the image shows Mumbai. The location parameter isn’t used to fetch coordinates dynamically, which affects sunrise/sunset times.
+The dateOfBirth parameter is unused, and the logic always uses new Date() (current date). This doesn’t allow for calculations on specific dates (e.g., May 5, 2025, as in the image).
+4. Zodiac Sign Label
+The image shows the zodiac sign as Taurus on May 5, 2025, which is incorrect (it should be Aries until May 15). The logic should dynamically determine the zodiac sign rather than relying on a passed zodiacSign parameter.
+
+Recommended Changes
+1. Fix Big Arm Calculation
+The Big Arm should divide the day and night periods into 12 equal parts each, based on their respective lengths in minutes, and calculate the exact Rune position.
+
+Changes:
+
+Calculate day and night lengths in minutes.
+Divide each into 12 equal parts (Runes).
+Determine which Rune the current time falls into and calculate the angle within that Rune.
+Updated Code for Big Arm:
+
+javascript
+
+Copy
+// Big Arm (Hour hand) calculation
+const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+// Duration of each Rune (day and night periods divided into 12 equal parts)
+const dayRuneDuration = dayLengthMinutes / 12; // Minutes per Day Rune
+const nightRuneDuration = nightLengthMinutes / 12; // Minutes per Night Rune
+
+let hourRotation;
+if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+  // Day period: 3 o'clock (90°) to 9 o'clock (270°)
+  const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+  const dayRuneIndex = Math.floor(minutesSinceSunrise / dayRuneDuration); // Which Day Rune
+  const progressInRune = (minutesSinceSunrise % dayRuneDuration) / dayRuneDuration; // Progress within Rune
+  const degreesPerRune = 180 / 12; // 15° per Rune
+  hourRotation = 90 + (dayRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+} else {
+  // Night period: 9 o'clock (270°) to 3 o'clock (90°)
+  let minutesSinceSunset;
+  if (currentMinutes < sunriseMinutes) {
+    // After midnight, before sunrise
+    minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+  } else {
+    // After sunset, before midnight
+    minutesSinceSunset = currentMinutes - sunsetMinutes;
+  }
+  const nightRuneIndex = Math.floor(minutesSinceSunset / nightRuneDuration); // Which Night Rune
+  const progressInRune = (minutesSinceSunset % nightRuneDuration) / nightRuneDuration; // Progress within Rune
+  const degreesPerRune = 180 / 12; // 15° per Rune
+  hourRotation = 270 + (nightRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+}
+hourRotation = hourRotation % 360;
+2. Fix Small Arm Calculation
+The Small Arm should calculate the zodiac sign dynamically based on the date and determine its position within the sign.
+
+Changes:
+
+Update zodiacEntryDates to match the provided reference dates (e.g., Aries: April 14, Taurus: May 15).
+Use the provided date (or current date) to determine the zodiac sign and progress within it.
+Remove the zodiacSign parameter and calculate it dynamically.
+Updated zodiacEntryDates:
+
+javascript
+
+Copy
+const zodiacEntryDates = {
+  'Capricorn': { month: 1, day: 14 },
+  'Aquarius': { month: 2, day: 13 },
+  'Pisces': { month: 3, day: 15 },
+  'Aries': { month: 4, day: 14 },
+  'Taurus': { month: 5, day: 15 },
+  'Gemini': { month: 6, day: 14 },
+  'Cancer': { month: 7, day: 15 },
+  'Leo': { month: 8, day: 15 },
+  'Virgo': { month: 9, day: 15 },
+  'Libra': { month: 10, day: 15 },
+  'Scorpio': { month: 11, day: 14 },
+  'Sagittarius': { month: 12, day: 14 }
+};
+Updated Small Arm Code:
+
+javascript
+
+Copy
+// Small Arm (Zodiac) calculation
+const currentDate = date || new Date(); // Use provided date or current date
+const currentYear = currentDate.getFullYear();
+let currentZodiacSign = '';
+let minuteRotation = 0;
+
+for (let i = 0; i < zodiacPeriods.length; i++) {
+  const [sign, entryDate] = zodiacPeriods[i];
+  const nextIndex = (i + 1) % zodiacPeriods.length;
+  const nextSign = zodiacPeriods[nextIndex];
+
+  const startDate = new Date(currentYear, entryDate.month - 1, entryDate.day);
+  let endDate = new Date(currentYear, nextSign[1].month - 1, nextSign[1].day);
+
+  if (endDate < startDate) {
+    endDate.setFullYear(currentYear + 1);
+  }
+
+  if (currentDate >= startDate && currentDate < endDate) {
+    currentZodiacSign = sign;
+    const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const daysPassed = (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const progressInSign = daysPassed / totalDays;
+    minuteRotation = (i * 30) + (progressInSign * 30); // 30° per zodiac sign
+    break;
+  }
+}
+3. Handle Location and Date Dynamically
+Use the location parameter to fetch coordinates (e.g., via a geocoding API like OpenStreetMap’s Nominatim or a predefined lookup).
+Use the date parameter to calculate sunrise/sunset and zodiac positions for the specified date.
+Changes:
+
+Add a function to map location to coordinates.
+Update the function signature to accept a date parameter.
+Example Location Mapping (Simplified):
+
+javascript
+
+Copy
+const locationCoordinates = {
+  'Mumbai': [19.0760, 72.8777],
+  'Belgrade': [44.7866, 20.4489]
+  // Add more locations or use a geocoding API
+};
+
+export function calculateRuneTime(
+  hours: number,
+  minutes: number,
+  location: string,
+  date?: Date // Add date parameter
+): RuneTimeInfluence {
+  const now = date || new Date(); // Use provided date or current date
+  const [lat, lng] = locationCoordinates[location] || [44.7866, 20.4489]; // Default to Belgrade if location not found
+
+  // Get sunrise and sunset times for the specified date
+  const sunrise = getSunrise(lat, lng, now);
+  const sunset = getSunset(lat, lng, now);
+  // Rest of the logic...
+}
+4. Return Zodiac Sign
+Add the calculated zodiac sign to the return value for display purposes.
+
+Updated Return Value:
+
+javascript
+
+Copy
+return {
+  hourRotation: hourRotation % 360,
+  minuteRotation: minuteRotation % 360,
+  zodiacSign: currentZodiacSign // Add the calculated zodiac sign
+};
+5. Fix Function Signature
+Remove the unused dateOfBirth parameter and the zodiacSign parameter, since we calculate the zodiac sign dynamically.
+
+Updated Signature:
+
+javascript
+
+Copy
+export function calculateRuneTime(
+  hours: number,
+  minutes: number,
+  location: string,
+  date?: Date
+): RuneTimeInfluence {
+  // Logic as updated above
+}
+Final Updated Code
+Here’s the complete updated logic:
+
+javascript
+
+Copy
+import { getSunrise, getSunset } from 'sunrise-sunset-js';
+
+interface RuneTimeInfluence {
+  hourRotation: number;
+  minuteRotation: number;
+  zodiacSign: string;
+}
+
+const zodiacEntryDates = {
+  'Capricorn': { month: 1, day: 14 },
+  'Aquarius': { month: 2, day: 13 },
+  'Pisces': { month: 3, day: 15 },
+  'Aries': { month: 4, day: 14 },
+  'Taurus': { month: 5, day: 15 },
+  'Gemini': { month: 6, day: 14 },
+  'Cancer': { month: 7, day: 15 },
+  'Leo': { month: 8, day: 15 },
+  'Virgo': { month: 9, day: 15 },
+  'Libra': { month: 10, day: 15 },
+  'Scorpio': { month: 11, day: 14 },
+  'Sagittarius': { month: 12, day: 14 }
+};
+
+const locationCoordinates = {
+  'Mumbai': [19.0760, 72.8777],
+  'Belgrade': [44.7866, 20.4489]
+};
+
+export function calculateRuneTime(
+  hours: number,
+  minutes: number,
+  location: string,
+  date?: Date
+): RuneTimeInfluence {
+  const now = date || new Date();
+  const [lat, lng] = locationCoordinates[location] || [44.7866, 20.4489];
+
+  // Get sunrise and sunset times
+  const sunrise = getSunrise(lat, lng, now);
+  const sunset = getSunset(lat, lng, now);
+
+  // Convert all times to minutes since midnight
+  const currentMinutes = hours * 60 + minutes;
+  const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
+  const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
+
+  // Big Arm (Hour hand) calculation
+  const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+  const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+  const dayRuneDuration = dayLengthMinutes / 12;
+  const nightRuneDuration = nightLengthMinutes / 12;
+
+  let hourRotation;
+  if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+    const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+    const dayRuneIndex = Math.floor(minutesSinceSunrise / dayRuneDuration);
+    const progressInRune = (minutesSinceSunrise % dayRuneDuration) / dayRuneDuration;
+    const degreesPerRune = 180 / 12;
+    hourRotation = 90 + (dayRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+  } else {
+    let minutesSinceSunset;
+    if (currentMinutes < sunriseMinutes) {
+      minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+    } else {
+      minutesSinceSunset = currentMinutes - sunsetMinutes;
+    }
+    const nightRuneIndex = Math.floor(minutesSinceSunset / nightRuneDuration);
+    const progressInRune = (minutesSinceSunset % nightRuneDuration) / nightRuneDuration;
+    const degreesPerRune = 180 / 12;
+    hourRotation = 270 + (nightRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+  }
+  hourRotation = hourRotation % 360;
+
+  // Small Arm (Zodiac) calculation
+  const currentDate = now;
+  const currentYear = currentDate.getFullYear();
+  const zodiacPeriods = Object.entries(zodiacEntryDates);
+  let currentZodiacSign = '';
+  let minuteRotation = 0;
+
+  for (let i = 0; i < zodiacPeriods.length; i++) {
+    const [sign, entryDate] = zodiacPeriods[i];
+    const nextIndex = (i + 1) % zodiacPeriods.length;
+    const nextSign = zodiacPeriods[nextIndex];
+
+    const startDate = new Date(currentYear, entryDate.month - 1, entryDate.day);
+    let endDate = new Date(currentYear, nextSign[1].month - 1, nextSign[1].day);
+
+    if (endDate < startDate) {
+      endDate.setFullYear(currentYear + 1);
+    }
+
+    if (currentDate >= startDate && currentDate < endDate) {
+      currentZodiacSign = sign;
+      const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+      const daysPassed = (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+      const progressInSign = daysPassed / totalDays;
+      minuteRotation = (i * 30) + (progressInSign * 30);
+      break;
+    }
+  }
+
+  return {
+    hourRotation,
+    minuteRotation: minuteRotation % 360,
+    zodiacSign: currentZodiacSign
+  };
+}
+Test with the Image
+For 02:05 PM in Mumbai on May 5, 2025:
+
+Big Arm: As calculated previously, it should be at 201° (slightly past 7 o’clock). The updated logic will now reflect this correctly.
+Small Arm: On May 5, 2025, the Sun is in Aries (April 14 to May 15), and the position should be at 20.31° (2/3 through Aries). The updated logic will calculate this.
+Zodiac Sign: The updated logic will return Aries, correcting the incorrect Taurus label in the image.
