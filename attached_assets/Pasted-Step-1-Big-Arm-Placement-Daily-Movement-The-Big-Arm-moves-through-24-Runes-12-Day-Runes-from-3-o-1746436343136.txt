@@ -1,0 +1,65 @@
+Step 1: Big Arm Placement (Daily Movement)
+The Big Arm moves through 24 Runes (12 Day Runes from 3 o’clock to 9 o’clock, 12 Night Runes from 9 o’clock to 3 o’clock), with day and night periods divided into 12 equal parts each. It extends to the external circle.
+
+Sunrise and Sunset Times for Mumbai on May 5, 2025
+From previous calculations (using timeanddate.com data):
+
+Sunrise: 06:09 AM IST
+Sunset: 07:01 PM IST
+Day and Night Lengths
+Day Length (06:09 AM to 07:01 PM): 12 hours 52 minutes = 772 minutes.
+Night Length (07:01 PM to 06:09 AM next day): 11 hours 8 minutes = 668 minutes.
+Divide Day and Night into 12 Equal Parts
+Day: 772 minutes ÷ 12 = 64.33 minutes per Day Rune (approximately 64 minutes 20 seconds).
+Night: 668 minutes ÷ 12 = 55.67 minutes per Night Rune (approximately 55 minutes 40 seconds).
+Big Arm Position at 02:40 PM
+Since 02:40 PM is during the day:
+
+Time elapsed since Sunrise:
+From 06:09 AM to 02:40 PM:
+06:09 AM to 02:09 PM = 8 hours = 480 minutes.
+02:09 PM to 02:40 PM = 31 minutes.
+Total: 480 minutes + 31 minutes = 511 minutes.
+Number of Day Runes passed:
+511 minutes ÷ 64.33 minutes per Rune = 7.94 Runes.
+The Big Arm has passed 7 full Day Runes and is 94% through the 8th Day Rune.
+Positioning the Big Arm
+The 12 Day Runes span from 3 o’clock (90°) to 9 o’clock (270°), covering 180°.
+Each Day Rune spans 180° ÷ 12 = 15°.
+After 7 Runes: 7 × 15° = 105°. Starting from 90° (3 o’clock), this is 90° + 105° = 195°.
+Additional 0.94 of a Rune: 0.94 × 15° = 14.1°.
+Total angle: 195° + 14.1° = 209.1°.
+The Big Arm should be at approximately 209.1°, which is just before the 7 o’clock position (210°), extending to the external circle.
+
+Big Arm in the Image
+In the image, the Big Arm (longer hand) is pointing toward the “Mid-day” mark, around the 6 o’clock position (180°). This does not match the calculated position of 209.1°, so the Big Arm is incorrectly placed.
+
+Step 2: Small Arm Placement (Yearly Movement)
+The Small Arm moves through the 12 Zodiac signs (each spanning 2 Runes), staying in each sign for about 30 days, extending to the circle bordering the Runes and Zodiac signs.
+
+Zodiac Transitions
+From previous calculations (using drikpanchang.com data):
+
+April 14, 2025: Sun enters Aries.
+May 15, 2025: Sun enters Taurus.
+On May 5, 2025, the Sun is in Aries:
+
+Duration in Aries: April 14 to May 15 = 31 days.
+Time elapsed in Aries by May 5: April 14 to May 5 = 21 days.
+Fraction of Aries completed: 21 days ÷ 31 days = 0.677 (67.7%).
+Positioning the Small Arm
+Each Zodiac sign spans 360° ÷ 12 = 30°.
+Aries starts at 12 o’clock (0°).
+67.7% of 30° = 0.677 × 30° = 20.31°.
+The Small Arm should be at 20.31°, about 2/3 through Aries, near the 12 o’clock position.
+Small Arm in the Image
+In the image, the Small Arm (shorter hand) is pointing toward the “Spring” section, around the 3-4 o’clock position (90°-120°), which aligns with Gemini or Cancer, not Aries. Additionally, the zodiac sign is labeled as Taurus, which is incorrect since the Sun enters Taurus on May 15, not yet on May 5. The Small Arm is incorrectly placed, and the zodiac label is wrong—it should be Aries.
+
+Step 3: Evaluate the Time
+The time shown is 02:40 PM, which is 4 minutes later than the previous image (02:36 PM). The Big Arm should have moved slightly clockwise from its position at 02:36 PM (208.2°) to 209.1°, but it’s still at 180°. This confirms the Big Arm’s incorrect placement.
+
+Conclusion: Is the Placement of Rune Clock Hands Correct?
+Big Arm: Should be at 209.1° (just before 7 o’clock), but it’s at 180° (6 o’clock). Incorrect.
+Small Arm: Should be at 20.31° (2/3 through Aries, near 12 o’clock), but it’s at 90°-120° (3-4 o’clock). Incorrect.
+Zodiac Sign: Labeled as Taurus, but it should be Aries on May 5, 2025. Incorrect.
+The placement of the Rune Clock hands is not correct. The Big Arm should be adjusted to 209.1°, the Small Arm to 20.31°, and the zodiac sign should be corrected to Aries. The updated calculation logic provided earlier should help achieve these correct placements.
