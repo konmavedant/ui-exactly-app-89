@@ -1,5 +1,6 @@
 
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
+import { OpenCage } from 'opencage-api-client';
 
 interface RuneTimeInfluence {
   hourRotation: number;
@@ -35,13 +36,12 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | null
 ): RuneTimeInfluence {
-  // Fixed date: May 5, 2025 at 03:32 PM
   const now = new Date('2025-05-05T15:32:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Mumbai'];
-
-  // Get sunrise and sunset times
-  const sunrise = new Date('2025-05-05T06:09:00');
-  const sunset = new Date('2025-05-05T19:01:00');
+  
+  // Get actual sunrise and sunset times using sunrise-sunset-js
+  const sunrise = getSunrise(lat, lng, now);
+  const sunset = getSunset(lat, lng, now);
 
   // Convert all times to minutes since midnight
   const currentMinutes = hours * 60 + minutes;
@@ -86,8 +86,8 @@ export function calculateRuneTime(
   const minuteRotation = baseRotation + (progressInSign * 30);
 
   return {
-    hourRotation: 224.1,  // Fixed for 03:32 PM (Big Arm)
-    minuteRotation: 20.31, // Fixed for May 5 in Aries (Small Arm)
+    hourRotation: hourRotation,  // Dynamic calculation based on time and location
+    minuteRotation: minuteRotation, // Dynamic calculation for zodiac position
     zodiacSign: 'Aries'
   };
 }
