@@ -16,33 +16,24 @@ interface RuneTimeInfluence {
 
 async function getAstrologyData(date: Date, lat: number, lng: number): Promise<AstrologyData | null> {
   try {
-    const apiKey = process.env.ASTRO_API_KEY;
+    const apiKey = 'R72YseHqxZ9jVFVdjk0OZ8lQkRyCuweU4FfMAU5p';
     if (!apiKey) {
       console.error('API key not found');
       return null;
     }
     
-    const response = await fetch('https://json.freeastrologyapi.com/planets/extended', {
+    const response = await fetch('https://api.astrolabsapp.com/v1/horoscope', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        date: date.getDate(),
-        hours: date.getHours(),
-        minutes: date.getMinutes(),
-        seconds: date.getSeconds(),
+        datetime: date.toISOString(),
         latitude: lat,
         longitude: lng,
-        timezone: 5.5,
-        settings: {
-          observation_point: "topocentric",
-          ayanamsha: "lahiri",
-          language: "en"
-        }
+        houses_system: "placidus",
+        zodiac_type: "tropical"
       })
     });
 
