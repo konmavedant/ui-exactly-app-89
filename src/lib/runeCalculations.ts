@@ -17,31 +17,33 @@ interface RuneTimeInfluence {
 async function getAstrologyData(date: Date, lat: number, lng: number): Promise<AstrologyData | null> {
   try {
     const apiKey = 'R72YseHqxZ9jVFVdjk0OZ8lQkRyCuweU4FfMAU5p';
-    if (!apiKey) {
-      console.error('API key not found');
-      return null;
-    }
     
-    const response = await fetch('https://api.astrolabsapp.com/v1/horoscope', {
+    const response = await fetch('https://api.astronomyapi.com/api/v2/bodies/positions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Basic ${btoa(apiKey + ':' + apiKey)}`
       },
       body: JSON.stringify({
-        datetime: date.toISOString(),
-        latitude: lat,
         longitude: lng,
-        houses_system: "placidus",
-        zodiac_type: "tropical"
+        latitude: lat,
+        elevation: 0,
+        from_date: date.toISOString().split('T')[0],
+        to_date: date.toISOString().split('T')[0],
+        time: date.toISOString().split('T')[1].split('.')[0]
       })
     });
 
-    const data = await response.json();
-    if (data.statusCode === 200) {
-      return data.output.Moon;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return null;
+
+    const data = await response.json();
+    return {
+      zodiac_sign_name: data.data.table.rows[0].cells[0].position.constellation.name || 'Aries',
+      normDegree: data.data.table.rows[0].cells[0].position.horizon.altitude || 0,
+      house_number: 1
+    };
   } catch (error) {
     console.error('Error fetching astrology data:', error);
     return null;
