@@ -82,43 +82,28 @@ const RuneClock: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
     const updateTime = async () => {
       try {
         const { lat, lng } = await getLatLngFromLocation(location_);
         const timeData = await getLocalTime(lat, lng);
         const timeDate = new Date(timeData.time);
-        const hours = timeDate.getHours();
-        const minutes = timeDate.getMinutes();
         
-        const formattedTime = format(
-          timeDate,
-          'hh:mm a'
-        );
-
-        setCurrentTime(formattedTime);
-        setHours(hours);
-        setMinutes(minutes);
+        setHours(timeDate.getHours());
+        setMinutes(timeDate.getMinutes());
+        setCurrentTime(format(timeDate, 'hh:mm a'));
       } catch (error) {
         console.error('Error fetching location time:', error);
       }
     };
 
-    // Initial update
     updateTime();
+    intervalId = setInterval(updateTime, 60000);
 
-    // Update every minute, aligned to the start of the minute
-    const now = new Date();
-    const delay = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-    
-    // Initial timeout to align with the start of the next minute
-    const alignmentTimeout = setTimeout(() => {
-      updateTime();
-      // Then set up the regular interval
-      const intervalId = setInterval(updateTime, 60000);
-      return () => clearInterval(intervalId);
-    }, delay);
-
-    return () => clearTimeout(alignmentTimeout);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [location_]);
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

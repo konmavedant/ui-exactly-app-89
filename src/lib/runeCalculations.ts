@@ -36,7 +36,9 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  const now = new Date('2025-05-05T14:40:00');  // Fixed date for May 5, 2025 at 2:40 PM
+  const now = new Date();
+  now.setHours(hours);
+  now.setMinutes(minutes);
 
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
