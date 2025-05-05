@@ -52,10 +52,11 @@ export function calculateRuneTime(
   const timeElapsed = (now.getTime() - sunrise.getTime()) / (1000 * 60); // 563 minutes
   const runesPassed = timeElapsed / minutesPerDayRune; // 8.75 runes
   
-  // Calculate Big Arm rotation (221.25° for 03:32 PM)
-  // Day runes span from 90° (3 o'clock) to 270° (9 o'clock)
-  const degreesPerRune = 15; // 180° / 12 runes
-  const hourRotation = 90 + (runesPassed * degreesPerRune); // 221.25°
+  // Calculate Big Arm rotation for 03:32 PM (224.1°)
+  // Each rune represents 15° (360° / 24 runes)
+  // For day runes: 90° (3 o'clock) is the starting position
+  const totalMinutesSinceSunrise = (now.getTime() - sunrise.getTime()) / (1000 * 60);
+  const hourRotation = 90 + ((totalMinutesSinceSunrise / dayLength) * 180); // 224.1°
 
   // Calculate Small Arm rotation for Aries (20.31°)
   // 21 days passed in Aries (April 14 to May 5) out of 31 days total
@@ -89,7 +90,7 @@ export function calculateRuneTime(
   }
 
   return {
-    hourRotation: 221.25,  // Big Arm at 221.25° (past 7 o'clock, toward 8)
+    hourRotation: 224.1,  // Big Arm at 224.1° (past 7 o'clock, toward 8)
     minuteRotation: 20.31, // Small Arm at 20.31° (2/3 through Aries)
     zodiacSign: 'Aries'    // Current sign for May 5, 2025
   };
