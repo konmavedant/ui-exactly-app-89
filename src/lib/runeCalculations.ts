@@ -38,12 +38,11 @@ export function calculateRuneTime(
 ): RuneTimeInfluence {
   let now = dateObj ? new Date(dateObj) : new Date();
   if (isNaN(now.getTime())) {
-    // If date is invalid, use current date
     now = new Date();
   }
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
-  // Get sunrise and sunset times for the specified date and location
+  // Get sunrise and sunset times
   const sunrise = getSunrise(lat, lng, now);
   const sunset = getSunset(lat, lng, now);
 
@@ -56,75 +55,81 @@ export function calculateRuneTime(
   const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
   const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
 
-  // Calculate duration of each rune (12 parts for day and night)
-  const dayRuneDuration = dayLengthMinutes / 12;
-  const nightRuneDuration = nightLengthMinutes / 12;
-
-  // Big Arm (Hour hand) calculation
+  // Calculate position in day/night cycle
+  const isDay = currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes;
+  
+  // Big Arm (Hour hand) calculation - Updated to match required angles
   let hourRotation;
-  if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
-    // Day period (3 o'clock to 9 o'clock)
-    const minutesSinceSunrise = currentMinutes - sunriseMinutes;
-    const dayRuneIndex = Math.floor(minutesSinceSunrise / dayRuneDuration);
-    const progressInRune = (minutesSinceSunrise % dayRuneDuration) / dayRuneDuration;
-    const degreesPerRune = 180 / 12; // 15° per rune
-    hourRotation = 90 + (dayRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+  if (isDay) {
+    // Day period (90° to 270°)
+    const dayProgress = (currentMinutes - sunriseMinutes) / dayLengthMinutes;
+    hourRotation = 90 + (dayProgress * 180);
   } else {
-    // Night period (9 o'clock to 3 o'clock)
-    let minutesSinceSunset;
+    // Night period (270° to 90°)
+    let nightProgress;
     if (currentMinutes < sunriseMinutes) {
       // After midnight, before sunrise
-      minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+      nightProgress = (currentMinutes + (1440 - sunsetMinutes)) / nightLengthMinutes;
     } else {
       // After sunset, before midnight
-      minutesSinceSunset = currentMinutes - sunsetMinutes;
+      nightProgress = (currentMinutes - sunsetMinutes) / nightLengthMinutes;
     }
-    const nightRuneIndex = Math.floor(minutesSinceSunset / nightRuneDuration);
-    const progressInRune = (minutesSinceSunset % nightRuneDuration) / nightRuneDuration;
-    const degreesPerRune = 180 / 12; // 15° per rune
-    hourRotation = 270 + (nightRuneIndex * degreesPerRune) + (progressInRune * degreesPerRune);
+    hourRotation = 270 + (nightProgress * 180);
+    if (hourRotation >= 360) {
+      hourRotation -= 360;
+    }
   }
 
   // Ensure rotation stays within 0-360 degrees
   hourRotation = hourRotation % 360;
 
   // Small Arm (Zodiac) calculation
-  const zodiacPeriods = Object.entries(zodiacEntryDates);
+  const zodiacPeriods = [
+    { sign: 'Aries', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19 },
+    { sign: 'Taurus', startMonth: 4, startDay: 20, endMonth: 5, endDay: 20 },
+    { sign: 'Gemini', startMonth: 5, startDay: 21, endMonth: 6, endDay: 20 },
+    { sign: 'Cancer', startMonth: 6, startDay: 21, endMonth: 7, endDay: 22 },
+    { sign: 'Leo', startMonth: 7, startDay: 23, endMonth: 8, endDay: 22 },
+    { sign: 'Virgo', startMonth: 8, startDay: 23, endMonth: 9, endDay: 22 },
+    { sign: 'Libra', startMonth: 9, startDay: 23, endMonth: 10, endDay: 22 },
+    { sign: 'Scorpio', startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
+    { sign: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 },
+    { sign: 'Capricorn', startMonth: 12, startDay: 22, endMonth: 1, endDay: 19 },
+    { sign: 'Aquarius', startMonth: 1, startDay: 20, endMonth: 2, endDay: 18 },
+    { sign: 'Pisces', startMonth: 2, startDay: 19, endMonth: 3, endDay: 20 }
+  ];
+
   let currentZodiacSign = '';
   let minuteRotation = 0;
 
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+
   // Find current zodiac sign and calculate position
   for (let i = 0; i < zodiacPeriods.length; i++) {
-    const [sign, entryDate] = zodiacPeriods[i];
-    const nextIndex = (i + 1) % zodiacPeriods.length;
-    const nextSign = zodiacPeriods[nextIndex];
+    const period = zodiacPeriods[i];
+    const startDate = new Date(now.getFullYear(), period.startMonth - 1, period.startDay);
+    let endDate = new Date(now.getFullYear(), period.endMonth - 1, period.endDay);
 
-    const startDate = new Date(now.getFullYear(), entryDate.month - 1, entryDate.day);
-    let endDate = new Date(
-      now.getFullYear(),
-      nextSign[1].month - 1,
-      nextSign[1].day
-    );
-
-    // Handle year transition
-    if (endDate < startDate) {
-      endDate.setFullYear(now.getFullYear() + 1);
+    // Handle year transition for Capricorn
+    if (period.sign === 'Capricorn' && month === 1) {
+      startDate.setFullYear(startDate.getFullYear() - 1);
     }
 
-    if (now >= startDate && now < endDate) {
-      currentZodiacSign = sign;
+    if (now >= startDate && now <= endDate) {
+      currentZodiacSign = period.sign;
       const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
       const daysPassed = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
       const progressInSign = daysPassed / totalDays;
-
-      // Calculate rotation starting from 12 o'clock position
-      minuteRotation = (i * 30) + (progressInSign * 30); // 30° per zodiac sign
+      
+      // Adjust rotation to align with zodiac positions (starting from 0° at Aries)
+      minuteRotation = (i * 30) + (progressInSign * 30);
       break;
     }
   }
 
   return {
-    hourRotation,
+    hourRotation: hourRotation % 360,
     minuteRotation: minuteRotation % 360,
     zodiacSign: currentZodiacSign
   };
