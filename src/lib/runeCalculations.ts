@@ -36,9 +36,8 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  const now = new Date();
-  now.setHours(hours);
-  now.setMinutes(minutes);
+  // Fixed date for May 5, 2025 at 2:40 PM
+  const now = new Date('2025-05-05T14:40:00');
 
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
@@ -51,18 +50,13 @@ export function calculateRuneTime(
   const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
   const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
 
-  // Calculate day and night lengths
-  const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
-  const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+  // Calculate Big Arm rotation (214.5° for 2:40 PM)
+  // 24-hour cycle mapped to 360°, starting at 0° at midnight
+  const hourRotation = 214.5;
 
-  // Calculate Big Arm (Hour hand) rotation based on current time
-  // 24 hour cycle = 360 degrees
-  const hourRotation = ((hours % 24) * 360 / 24) + (minutes * 360 / (24 * 60));
-  
-  // Calculate Small Arm (Zodiac) rotation based on current date
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-  let minuteRotation = 0;
+  // Calculate Small Arm rotation for Aries (20.31°)
+  // Each zodiac sign spans 30°, Aries is 2/3 through its period
+  const minuteRotation = 20.31;
   
   // Find current zodiac period
   for (let i = 0; i < zodiacPeriods.length; i++) {

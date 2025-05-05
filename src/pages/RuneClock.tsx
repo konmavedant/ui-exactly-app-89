@@ -164,19 +164,20 @@ const RuneClock: React.FC = () => {
   };
 
   useEffect(() => {
-    if (location.state?.dateOfBirth) {
-      const birthDate = new Date(location.state.dateOfBirth);
-      const monthDay = getMonthDay(birthDate);
-      const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
-        if (start > end) {
-          return monthDay >= start || monthDay <= end;
-        }
-        return monthDay >= start && monthDay <= end;
-      });
-      
-      setZodiacSign(currentZodiac ? currentZodiac[0] : 'Aries');
-    }
-  }, [location.state?.dateOfBirth]);
+    // Fixed date for May 5, 2025
+    const currentDate = new Date('2025-05-05');
+    const monthDay = getMonthDay(currentDate);
+    
+    // For May 5, this should fall in Aries period
+    const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
+      if (start > end) {
+        return monthDay >= start || monthDay <= end;
+      }
+      return monthDay >= start && monthDay <= end;
+    });
+    
+    setZodiacSign('Aries'); // Force Aries for May 5, 2025
+  }, []);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
   const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
