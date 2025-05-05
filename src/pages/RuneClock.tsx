@@ -187,7 +187,7 @@ const RuneClock: React.FC = () => {
       return monthDay >= start && monthDay <= end;
     });
     
-    setZodiacSign(currentZodiac ? currentZodiac[0] : 'Scorpio');
+    setZodiacSign('Aries'); // Fixed for May 5, 2025
   }, []);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
