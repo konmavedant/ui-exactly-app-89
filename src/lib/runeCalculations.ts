@@ -36,7 +36,7 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  const now = dateObj ? new Date(dateObj) : new Date();
+  let now = dateObj ? new Date(dateObj) : new Date();
   if (isNaN(now.getTime())) {
     // If date is invalid, use current date
     now = new Date();
