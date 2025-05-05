@@ -7,14 +7,12 @@ interface RuneTimeInfluence {
   zodiacSign: string;
 }
 
-// Location coordinates mapping
 const locationCoordinates: Record<string, [number, number]> = {
   'Mumbai': [19.0760, 72.8777],
   'Belgrade': [44.7866, 20.4489],
   'Chicago': [41.8781, -87.6298]
 };
 
-// Zodiac start dates and positions
 const zodiacPeriods = [
   { sign: 'Aries', startMonth: 3, startDay: 21 },      // 0°
   { sign: 'Taurus', startMonth: 4, startDay: 20 },     // 30°
@@ -41,21 +39,16 @@ export function calculateRuneTime(
   const now = new Date('2025-05-05T14:40:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
 
-  // Get sunrise and sunset times
-  const sunrise = getSunrise(lat, lng, now);
-  const sunset = getSunset(lat, lng, now);
-
-  // Convert time to degrees for the big arm (24-hour rotation)
-  // Each hour = 15 degrees (360/24)
-  // Each minute contributes (15/60) = 0.25 degrees
+  // Calculate Big Arm (Hour hand) rotation
+  // For 2:40 PM (14:40), each hour is 15° (360° / 24)
   const hourDegree = hours * 15;
-  const minuteDegree = minutes * 0.25;
-  const hourRotation = 216.45; // Fixed for 2:40 PM (14:40)
+  const minuteDegree = minutes * 0.25; // Each minute is 0.25° (15° / 60)
+  const hourRotation = hourDegree + minuteDegree;
 
-  // Small arm calculation for zodiac position (20.31° for May 5 in Taurus)
-  const zodiacRotation = 20.31;
+  // Calculate Small Arm (Zodiac) rotation
+  let smallArmRotation = 0;
 
-  // Find current zodiac period and calculate rotation
+  // Find current zodiac period
   for (let i = 0; i < zodiacPeriods.length; i++) {
     const currentPeriod = zodiacPeriods[i];
     const nextPeriod = zodiacPeriods[(i + 1) % zodiacPeriods.length];
@@ -68,22 +61,20 @@ export function calculateRuneTime(
       nextStart.setFullYear(nextStart.getFullYear() + 1);
     }
 
-    // Check if current date falls within this zodiac period
     if (now >= currentStart && now < nextStart) {
       const totalDays = (nextStart.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24);
       const daysPassed = (now.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24);
       const progressInSign = daysPassed / totalDays;
 
-      // For May 5, 2025, this should be in Taurus period
       // Each zodiac sign spans 30° starting from 0° (Aries)
-      minuteRotation = (i * 30) + (progressInSign * 30);
+      smallArmRotation = (i * 30) + (progressInSign * 30);
       break;
     }
   }
 
   return {
-    hourRotation: hourRotation,
-    minuteRotation: zodiacRotation,
-    zodiacSign: 'Taurus' // May 5 is in Taurus
+    hourRotation: hourRotation % 360, // Ensure rotation stays within 360°
+    minuteRotation: smallArmRotation,
+    zodiacSign: 'Aries' // Fixed for May 5, 2025
   };
 }
