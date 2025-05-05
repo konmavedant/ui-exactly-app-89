@@ -16,21 +16,32 @@ interface RuneTimeInfluence {
 
 async function getAstrologyData(date: Date, lat: number, lng: number): Promise<AstrologyData | null> {
   try {
-    const apiKey = 'R72YseHqxZ9jVFVdjk0OZ8lQkRyCuweU4FfMAU5p';
+    const apiKey = process.env.ASTRO_API_KEY;
+    if (!apiKey) {
+      console.error('API key not found');
+      return null;
+    }
     
-    const response = await fetch('https://api.astronomyapi.com/api/v2/bodies/positions', {
+    const response = await fetch('https://json.freeastrologyapi.com/planets/extended', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${btoa(apiKey + ':' + apiKey)}`
+        'x-api-key': apiKey
       },
       body: JSON.stringify({
-        longitude: lng,
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        date: date.getDate(),
+        hours: date.getHours(),
+        minutes: date.getMinutes(),
+        seconds: date.getSeconds(),
         latitude: lat,
-        elevation: 0,
-        from_date: date.toISOString().split('T')[0],
-        to_date: date.toISOString().split('T')[0],
-        time: date.toISOString().split('T')[1].split('.')[0]
+        longitude: lng,
+        timezone: 5.5,
+        settings: {
+          observation_point: "topocentric",
+          ayanamsha: "lahiri"
+        }
       })
     });
 
