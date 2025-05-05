@@ -16,11 +16,17 @@ interface RuneTimeInfluence {
 
 async function getAstrologyData(date: Date, lat: number, lng: number): Promise<AstrologyData | null> {
   try {
+    const apiKey = process.env.ASTRO_API_KEY;
+    if (!apiKey) {
+      console.error('API key not found');
+      return null;
+    }
+    
     const response = await fetch('https://json.freeastrologyapi.com/planets/extended', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ASTRO_API_KEY || ''
+        'x-api-key': apiKey
       },
       body: JSON.stringify({
         year: date.getFullYear(),
