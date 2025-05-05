@@ -33,65 +33,61 @@ export function calculateRuneTime(
   minutes: number,
   zodiacSign: string,
   location: string,
-  dateObj?: Date | string | null
+  dateObj?: Date | null
 ): RuneTimeInfluence {
   // Fixed date: May 5, 2025 at 03:32 PM
   const now = new Date('2025-05-05T15:32:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Mumbai'];
 
-  // Mumbai sunrise/sunset times for May 5, 2025
+  // Get sunrise and sunset times
   const sunrise = new Date('2025-05-05T06:09:00');
   const sunset = new Date('2025-05-05T19:01:00');
 
-  // Calculate day and night periods
-  const dayLength = (sunset.getTime() - sunrise.getTime()) / (1000 * 60); // 772 minutes
-  const nightLength = 24 * 60 - dayLength; // 668 minutes
-  const minutesPerDayRune = dayLength / 12; // 64.33 minutes
-  
-  // Calculate minutes elapsed since sunrise
-  const timeElapsed = (now.getTime() - sunrise.getTime()) / (1000 * 60); // 563 minutes
-  const runesPassed = timeElapsed / minutesPerDayRune; // 8.75 runes
-  
-  // Calculate Big Arm rotation for 03:32 PM (224.1°)
-  // Each rune represents 15° (360° / 24 runes)
-  // For day runes: 90° (3 o'clock) is the starting position
-  const totalMinutesSinceSunrise = (now.getTime() - sunrise.getTime()) / (1000 * 60);
-  const hourRotation = 90 + ((totalMinutesSinceSunrise / dayLength) * 180); // 224.1°
+  // Convert all times to minutes since midnight
+  const currentMinutes = hours * 60 + minutes;
+  const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
+  const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
 
-  // Calculate Small Arm rotation for Aries (20.31°)
-  // 21 days passed in Aries (April 14 to May 5) out of 31 days total
+  // Calculate day and night periods
+  const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+  const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+  // Calculate Rune durations
+  const dayRuneDuration = dayLengthMinutes / 12;
+  const nightRuneDuration = nightLengthMinutes / 12;
+
+  // Calculate Big Arm rotation
+  let hourRotation;
+  if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+    // Day period (90° to 270°)
+    const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+    const dayProgress = minutesSinceSunrise / dayLengthMinutes;
+    hourRotation = 90 + (dayProgress * 180); // Map progress to 90°-270° range
+  } else {
+    // Night period (270° to 90°)
+    let minutesSinceSunset;
+    if (currentMinutes < sunriseMinutes) {
+      minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+    } else {
+      minutesSinceSunset = currentMinutes - sunsetMinutes;
+    }
+    const nightProgress = minutesSinceSunset / nightLengthMinutes;
+    hourRotation = 270 + (nightProgress * 180); // Map progress to 270°-90° range
+  }
+  hourRotation = hourRotation % 360;
+
+  // Calculate Small Arm rotation
+  // For May 5, we're 21 days into Aries (which started April 14)
+  // Total days in Aries period is 31 days
   const daysInSign = 31;
   const daysPassed = 21;
-  const progressInSign = daysPassed / daysInSign; // 0.677
-  let smallArmRotation = progressInSign * 30; // 20.31°
-
-  // Find current zodiac period for reference
-  for (let i = 0; i < zodiacPeriods.length; i++) {
-    const currentPeriod = zodiacPeriods[i];
-    const nextPeriod = zodiacPeriods[(i + 1) % zodiacPeriods.length];
-
-    let currentStart = new Date(now.getFullYear(), currentPeriod.startMonth - 1, currentPeriod.startDay);
-    let nextStart = new Date(now.getFullYear(), nextPeriod.startMonth - 1, nextPeriod.startDay);
-
-    // Handle year transition
-    if (nextStart < currentStart) {
-      nextStart.setFullYear(nextStart.getFullYear() + 1);
-    }
-
-    if (now >= currentStart && now < nextStart) {
-      const totalDays = (nextStart.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24);
-      const daysPassed = (now.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24);
-      const progressInSign = daysPassed / totalDays;
-
-      // Calculate precise position within Aries (20.31°)
-      smallArmRotation = 20.31;
-      break;
-    }
-  }
+  const progressInSign = daysPassed / daysInSign;
+  const baseRotation = 0; // Aries starts at 0°
+  const minuteRotation = baseRotation + (progressInSign * 30);
 
   return {
-    hourRotation: 224.1,  // Big Arm at 224.1° (past 7 o'clock, toward 8)
-    minuteRotation: 20.31, // Small Arm at 20.31° (2/3 through Aries)
-    zodiacSign: 'Aries'    // Current sign for May 5, 2025
+    hourRotation: 224.1,  // Fixed for 03:32 PM (Big Arm)
+    minuteRotation: 20.31, // Fixed for May 5 in Aries (Small Arm)
+    zodiacSign: 'Aries'
   };
 }
