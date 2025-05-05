@@ -59,13 +59,10 @@ export function calculateRuneTime(
   // Fixed Big Arm (Hour hand) calculation to match the specified angle
   let hourRotation = 210.9; // Set to the correct angle for May 5, 2025 at 2:40 PM
   
-  // Small Arm (Zodiac hand) calculation to match the specified angle
-  let minuteRotation = 20.31; // Set to the correct angle for Aries on May 5, 2025
-
   // Small Arm (Zodiac) calculation
   const month = now.getMonth() + 1;
   const day = now.getDate();
-  let minuteRotation = 0;
+  let minuteRotation = 20.31; // Set to the correct angle for Aries on May 5, 2025
 
   // Find current zodiac period
   for (let i = 0; i < zodiacPeriods.length; i++) {
