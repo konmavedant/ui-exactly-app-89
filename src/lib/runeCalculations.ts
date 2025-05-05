@@ -62,7 +62,7 @@ export function calculateRuneTime(
   const daysInSign = 31;
   const daysPassed = 21;
   const progressInSign = daysPassed / daysInSign; // 0.677
-  const smallArmRotation = progressInSign * 30; // 20.31°
+  let smallArmRotation = progressInSign * 30; // 20.31°
 
   // Find current zodiac period for reference
   for (let i = 0; i < zodiacPeriods.length; i++) {
