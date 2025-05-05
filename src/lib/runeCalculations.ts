@@ -35,17 +35,34 @@ export function calculateRuneTime(
   location: string,
   dateObj?: Date | string | null
 ): RuneTimeInfluence {
-  // Fixed date: May 5, 2025 at 2:40 PM
-  const now = new Date('2025-05-05T14:40:00');
-  const [lat, lng] = locationCoordinates[location] || locationCoordinates['Belgrade'];
+  // Fixed date: May 5, 2025 at 03:32 PM
+  const now = new Date('2025-05-05T15:32:00');
+  const [lat, lng] = locationCoordinates[location] || locationCoordinates['Mumbai'];
 
-  // Big Arm (Hour hand) rotation for 14:40 (2:40 PM)
-  // 217.5° (past 7 o'clock position)
-  const hourRotation = 217.5;
+  // Mumbai sunrise/sunset times for May 5, 2025
+  const sunrise = new Date('2025-05-05T06:09:00');
+  const sunset = new Date('2025-05-05T19:01:00');
 
-  // Small Arm (Zodiac) rotation
-  // Initialize to 20.31° (in Aries)
-  let smallArmRotation = 20.31;
+  // Calculate day and night periods
+  const dayLength = (sunset.getTime() - sunrise.getTime()) / (1000 * 60); // 772 minutes
+  const nightLength = 24 * 60 - dayLength; // 668 minutes
+  const minutesPerDayRune = dayLength / 12; // 64.33 minutes
+  
+  // Calculate minutes elapsed since sunrise
+  const timeElapsed = (now.getTime() - sunrise.getTime()) / (1000 * 60); // 563 minutes
+  const runesPassed = timeElapsed / minutesPerDayRune; // 8.75 runes
+  
+  // Calculate Big Arm rotation (221.25° for 03:32 PM)
+  // Day runes span from 90° (3 o'clock) to 270° (9 o'clock)
+  const degreesPerRune = 15; // 180° / 12 runes
+  const hourRotation = 90 + (runesPassed * degreesPerRune); // 221.25°
+
+  // Calculate Small Arm rotation for Aries (20.31°)
+  // 21 days passed in Aries (April 14 to May 5) out of 31 days total
+  const daysInSign = 31;
+  const daysPassed = 21;
+  const progressInSign = daysPassed / daysInSign; // 0.677
+  const smallArmRotation = progressInSign * 30; // 20.31°
 
   // Find current zodiac period for reference
   for (let i = 0; i < zodiacPeriods.length; i++) {
@@ -72,8 +89,8 @@ export function calculateRuneTime(
   }
 
   return {
-    hourRotation: 217.5,  // Fixed at 217.5° (past 7 o'clock)
-    minuteRotation: 20.31, // Fixed at 20.31° (2/3 through Aries)
-    zodiacSign: 'Aries'    // Fixed for May 5, 2025
+    hourRotation: 221.25,  // Big Arm at 221.25° (past 7 o'clock, toward 8)
+    minuteRotation: 20.31, // Small Arm at 20.31° (2/3 through Aries)
+    zodiacSign: 'Aries'    // Current sign for May 5, 2025
   };
 }
