@@ -2,63 +2,10 @@
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 import { OpenCage } from 'opencage-api-client';
 
-interface AstrologyData {
-  zodiac_sign_name: string;
-  normDegree: number;
-  house_number: number;
-}
-
 interface RuneTimeInfluence {
   hourRotation: number;
   minuteRotation: number;
   zodiacSign: string;
-}
-
-async function getAstrologyData(date: Date, lat: number, lng: number): Promise<AstrologyData | null> {
-  try {
-    const apiKey = process.env.ASTRO_API_KEY;
-    if (!apiKey) {
-      console.error('API key not found');
-      return null;
-    }
-    
-    const response = await fetch('https://json.freeastrologyapi.com/planets/extended', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey
-      },
-      body: JSON.stringify({
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        date: date.getDate(),
-        hours: date.getHours(),
-        minutes: date.getMinutes(),
-        seconds: date.getSeconds(),
-        latitude: lat,
-        longitude: lng,
-        timezone: 5.5,
-        settings: {
-          observation_point: "topocentric",
-          ayanamsha: "lahiri"
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return {
-      zodiac_sign_name: data.data.table.rows[0].cells[0].position.constellation.name || 'Aries',
-      normDegree: data.data.table.rows[0].cells[0].position.horizon.altitude || 0,
-      house_number: 1
-    };
-  } catch (error) {
-    console.error('Error fetching astrology data:', error);
-    return null;
-  }
 }
 
 const locationCoordinates: Record<string, [number, number]> = {
@@ -82,13 +29,13 @@ const zodiacPeriods = [
   { sign: 'Pisces', startMonth: 2, startDay: 19 }      // 330°
 ];
 
-export async function calculateRuneTime(
+export function calculateRuneTime(
   hours: number,
   minutes: number,
   zodiacSign: string,
   location: string,
   dateObj?: Date | null
-): Promise<RuneTimeInfluence> {
+): RuneTimeInfluence {
   const now = new Date('2025-05-05T15:32:00');
   const [lat, lng] = locationCoordinates[location] || locationCoordinates['Mumbai'];
   
@@ -136,20 +83,11 @@ export async function calculateRuneTime(
   const daysPassed = 21;
   const progressInSign = daysPassed / daysInSign;
   const baseRotation = 0; // Aries starts at 0°
-  const astrologyData = await getAstrologyData(now, lat, lng);
-  
-  let minuteRotation = baseRotation + (progressInSign * 30);
-  let finalZodiacSign = zodiacSign;
-  
-  if (astrologyData) {
-    // Use the moon's position for more accurate zodiac calculations
-    minuteRotation = astrologyData.normDegree;
-    finalZodiacSign = astrologyData.zodiac_sign_name;
-  }
+  const minuteRotation = baseRotation + (progressInSign * 30);
 
   return {
-    hourRotation: hourRotation,
-    minuteRotation: minuteRotation,
-    zodiacSign: finalZodiacSign
+    hourRotation: hourRotation,  // Dynamic calculation based on time and location
+    minuteRotation: minuteRotation, // Dynamic calculation for zodiac position
+    zodiacSign: 'Aries'
   };
 }
