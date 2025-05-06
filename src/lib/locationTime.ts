@@ -31,27 +31,17 @@ export async function getLatLngFromLocation(location: string): Promise<GeoLocati
 }
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
-  const API_KEY = 'c89e8967f04d4d0f86e91b4be385b830';
-  const url = `https://api.ipgeolocation.io/timezone?apiKey=${API_KEY}&lat=${lat}&long=${lng}`;
-  
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+    // Use the system time and calculate offset based on longitude
+    const now = new Date();
+    const gmtOffset = Math.round(lng / 15); // Approximate timezone offset
     
-    if (!data.date_time_txt) {
-      throw new Error('Missing date_time_txt in API response');
-    }
-
-    // Ensure we have a valid timezone offset, default to 0 if missing
-    const gmtOffset = data.timezone_offset ? parseInt(data.timezone_offset) : 0;
-
+    const localTime = new Date(now.getTime() + (gmtOffset * 3600000));
+    
     return {
-      time: data.date_time_txt,
+      time: localTime.toISOString(),
       timezone: {
-        gmtOffset: gmtOffset * 3600 // Convert to seconds
+        gmtOffset: gmtOffset * 3600
       }
     };
   } catch (error) {

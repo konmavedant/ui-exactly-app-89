@@ -1,4 +1,3 @@
-
 import { getSunriseSunsetTimes, getLatLngFromLocation, getLocalTime } from './locationTime';
 
 interface RuneTimeInfluence {
@@ -32,13 +31,10 @@ const VEDIC_DATES = {
 async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate: string }> {
   try {
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    
-    // Determine zodiac sign based on Vedic dates
     for (const [sign, dates] of Object.entries(VEDIC_DATES)) {
       const year = date.getFullYear();
       const startDate = new Date(`${year}-${dates.start}`);
       const endDate = new Date(`${year}-${dates.end}`);
-      
       if (date >= startDate && date < endDate) {
         return {
           sign,
@@ -46,8 +42,6 @@ async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate
         };
       }
     }
-    
-    // Default to Aries if no match found
     return {
       sign: 'Aries',
       entryDate: new Date(`${date.getFullYear()}-04-14`).toISOString()
@@ -67,67 +61,62 @@ function adjustTimeToLocal(utcTime: Date, gmtOffset: number): Date {
 
 export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
   try {
-    if (!location) {
-      throw new Error("Location is required");
-    }
-
-    // Get coordinates and time data
+    // Get coordinates
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
-    if (!timeData || !timeData.time) {
-      throw new Error("Invalid time data received");
-    }
-    
     const localTime = new Date(timeData.time);
     const gmtOffset = timeData.timezone?.gmtOffset || 0;
-    
-    // Get sunrise/sunset times and adjust to local timezone
+
+    // Get sunrise/sunset times
     const dateStr = localTime.toISOString().split('T')[0];
     const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-    if (!sunData || !sunData.sunrise || !sunData.sunset) {
-      throw new Error("Invalid sunrise/sunset data");
+
+    if (!sunData?.sunrise || !sunData?.sunset) {
+      // Default sunrise/sunset times if API fails
+      const sunrise = new Date(localTime);
+      sunrise.setHours(6, 0, 0, 0);
+      const sunset = new Date(localTime);
+      sunset.setHours(18, 0, 0, 0);
+      sunData.sunrise = sunrise;
+      sunData.sunset = sunset;
     }
-    
-    const sunrise = adjustTimeToLocal(new Date(sunData.sunrise), gmtOffset);
-    const sunset = adjustTimeToLocal(new Date(sunData.sunset), gmtOffset);
 
-    // Calculate day and night periods in minutes
-    const dayStart = sunrise.getHours() * 60 + sunrise.getMinutes();
-    const dayEnd = sunset.getHours() * 60 + sunset.getMinutes();
-    const totalMinutesSinceMidnight = localTime.getHours() * 60 + localTime.getMinutes();
-    
-    // Calculate Big Arm rotation
-    const dayLength = dayEnd - dayStart;
-    const nightLength = 1440 - dayLength;
-    let hourRotation: number;
+    // Calculate time in minutes since midnight
+    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
+    const sunriseMinutes = sunData.sunrise.getHours() * 60 + sunData.sunrise.getMinutes();
+    const sunsetMinutes = sunData.sunset.getHours() * 60 + sunData.sunset.getMinutes();
 
-    if (totalMinutesSinceMidnight >= dayStart && totalMinutesSinceMidnight <= dayEnd) {
-      // Daytime calculation (90° to 270°)
-      const minutesIntoDaytime = totalMinutesSinceMidnight - dayStart;
-      const dayProgress = minutesIntoDaytime / dayLength;
+    // Calculate day and night periods
+    const dayLength = sunsetMinutes - sunriseMinutes;
+    const nightLength = 1440 - dayLength; // 24 hours = 1440 minutes
+
+    // Calculate hour hand rotation
+    let hourRotation = 0;
+    if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+      // Day period (90° to 270°)
+      const dayProgress = (currentMinutes - sunriseMinutes) / dayLength;
       hourRotation = 90 + (dayProgress * 180);
     } else {
-      // Nighttime calculation (270° to 90°)
-      let minutesIntoNight;
-      if (totalMinutesSinceMidnight < dayStart) {
-        minutesIntoNight = totalMinutesSinceMidnight + (1440 - dayEnd);
+      // Night period (270° to 90°)
+      let nightProgress;
+      if (currentMinutes < sunriseMinutes) {
+        // Before sunrise
+        nightProgress = currentMinutes / (sunriseMinutes);
       } else {
-        minutesIntoNight = totalMinutesSinceMidnight - dayEnd;
+        // After sunset
+        nightProgress = (currentMinutes - sunsetMinutes) / (1440 - sunsetMinutes + sunriseMinutes);
       }
-      const nightProgress = minutesIntoNight / nightLength;
       hourRotation = 270 + (nightProgress * 180);
       if (hourRotation >= 360) {
         hourRotation -= 360;
       }
     }
 
-    // Calculate Small Arm (zodiac) position - fixed at Aries
-    const ariesIndex = VEDIC_ZODIAC_SIGNS.indexOf('Aries');
-    const baseAngle = ariesIndex * 30;
-    const minuteRotation = baseAngle; // Fixed at Aries position
+    // Fixed Aries position for small hand (90 degrees)
+    const minuteRotation = 90;
 
     return {
-      hourRotation: hourRotation % 360,
+      hourRotation,
       minuteRotation,
       currentTime: localTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -135,20 +124,21 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
         hour12: true
       }),
       zodiacSign: 'Aries',
-      timezone: `GMT${gmtOffset >= 0 ? '+' : ''}${gmtOffset / 3600}`
+      timezone: `GMT${gmtOffset >= 0 ? '+' : ''}${Math.floor(gmtOffset / 3600)}`
     };
   } catch (error) {
     console.error('Error in calculateRuneTime:', error);
+    // Return default values on error
     return {
       hourRotation: 0,
-      minuteRotation: 0,
+      minuteRotation: 90, // Fixed Aries position
       currentTime: new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       }),
       zodiacSign: 'Aries',
-      timezone: 'GMT+0'
+      timezone: 'GMT+5.5' // Default to India timezone
     };
   }
 }
