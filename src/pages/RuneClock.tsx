@@ -72,9 +72,7 @@ const RuneClock: React.FC = () => {
       }
     }
   }, [latestState]);
-  const [zodiacSign, setZodiacSign] = useState<string>(() => 
-    latestState?.dateOfBirth ? getZodiacSign(new Date(latestState.dateOfBirth)) : "Scorpio"
-  );
+  const [zodiacSign, setZodiacSign] = useState<string>(""); // Will be set by calculateRuneTime
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [timezone, setTimezone] = useState<string>("America/Chicago");

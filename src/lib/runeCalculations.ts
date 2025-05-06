@@ -110,16 +110,16 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       hourRotation = 270 + (progressThroughNight * 180);
     }
 
-    // Calculate Minute Hand (zodiac) rotation
+    // Calculate Minute Hand (zodiac) rotation based on current date
     const zodiacSign = await getZodiacSignForDate(now);
     const dayOfMonth = now.getDate();
 
-    // Calculate precise position within zodiac sign
-    const zodiacSigns = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 
-                         'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    // Fixed zodiac positions in the clock (counter-clockwise from 3 o'clock)
+    const zodiacSigns = ['Aries', 'Pisces', 'Aquarius', 'Capricorn', 'Sagittarius', 'Scorpio',
+                        'Libra', 'Virgo', 'Leo', 'Cancer', 'Gemini', 'Taurus'];
     const signIndex = zodiacSigns.indexOf(zodiacSign);
 
-    // Each zodiac sign spans 30 degrees
+    // Each zodiac sign spans 30 degrees, starting from 0° at 3 o'clock
     const baseAngle = signIndex * 30;
     // Calculate progress within the current sign (0-30 degrees)
     const progressInSign = (dayOfMonth / 30) * 30;
