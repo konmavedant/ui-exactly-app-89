@@ -133,23 +133,14 @@ const RuneClock: React.FC = () => {
   const handleSearchSubmit = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && searchInput.length > 2) {
       try {
-        const { lat, lng } = await getLatLngFromLocation(searchInput);
-        const timeData = await getLocalTime(lat, lng);
-        const localTime = new Date(timeData.time);
-        
-        setLocation(searchInput.split(',')[0]); // Only take the city name
-        setHours(localTime.getHours());
-        setMinutes(localTime.getMinutes());
-        setCurrentTime(localTime.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        }));
-        
-        const month = localTime.getMonth() + 1;
-        const day = localTime.getDate();
-        setZodiacSign(getZodiacSign(localTime));
-        
+        setLocation(searchInput.split(',')[0]); // Update location immediately
+        const runeData = await calculateRuneTime(searchInput);
+        setCurrentTime(runeData.currentTime);
+        setZodiacSign(runeData.zodiacSign);
+        setRotations({
+          hourRotation: runeData.hourRotation,
+          minuteRotation: 90 // Fixed at Aries position
+        });
         setSearchInput('');
         event.currentTarget.blur();
       } catch (error) {

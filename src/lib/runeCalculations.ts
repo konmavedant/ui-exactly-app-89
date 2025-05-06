@@ -1,4 +1,3 @@
-
 import { getSunriseSunsetTimes, getLatLngFromLocation, getLocalTime } from './locationTime';
 
 interface RuneTimeInfluence {
@@ -98,11 +97,11 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
     const localTime = new Date(timeData.time);
-    
+
     // Get sunrise/sunset times
     const dateStr = localTime.toISOString().split('T')[0];
     const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-    
+
     if (!sunData?.sunrise || !sunData?.sunset) {
       throw new Error('Failed to get sunrise/sunset times');
     }
@@ -117,8 +116,18 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     // Small arm (minute hand) stays fixed at Aries (90 degrees)
     const minuteRotation = 90;
 
-    // Format current time
+    // Format time string properly
     const timeString = localTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'UTC'
+    });
+
+    // Add timezone offset to displayed time
+    const offsetHours = timeData.timezone?.gmtOffset / 3600;
+    const adjustedTime = new Date(localTime.getTime() + (offsetHours * 3600000));
+    const displayTime = adjustedTime.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
@@ -129,8 +138,8 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
 
     return {
       hourRotation,
-      minuteRotation,
-      currentTime: timeString,
+      minuteRotation: 90, // Fixed at Aries position (90 degrees)
+      currentTime: displayTime,
       zodiacSign: zodiacInfo.sign,
       timezone: `GMT${timeData.timezone?.gmtOffset >= 0 ? '+' : ''}${Math.floor(timeData.timezone?.gmtOffset / 3600)}`
     };
