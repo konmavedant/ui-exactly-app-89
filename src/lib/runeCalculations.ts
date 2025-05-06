@@ -1,3 +1,4 @@
+
 import { getSunriseSunsetTimes, getLatLngFromLocation, getLocalTime } from './locationTime';
 
 interface RuneTimeInfluence {
@@ -28,6 +29,42 @@ const VEDIC_DATES = {
   'Pisces': { start: '14-03', end: '14-04' }
 };
 
+function calculateBigArmRotation(
+  currentTime: Date,
+  sunrise: Date,
+  sunset: Date
+): number {
+  const current = currentTime.getTime();
+  const sunriseTime = sunrise.getTime();
+  const sunsetTime = sunset.getTime();
+
+  // Check if it's day or night
+  const isDaytime = current >= sunriseTime && current <= sunsetTime;
+
+  if (isDaytime) {
+    // During day: map time between sunrise (90°) and sunset (270°)
+    const dayProgress = (current - sunriseTime) / (sunsetTime - sunriseTime);
+    return 90 + (dayProgress * 180); // 180° spread across day period
+  } else {
+    // During night: map time between sunset (270°) and next sunrise (90°)
+    let nightProgress;
+    if (current > sunsetTime) {
+      // After sunset but before midnight
+      const nextSunrise = new Date(sunrise);
+      nextSunrise.setDate(nextSunrise.getDate() + 1);
+      nightProgress = (current - sunsetTime) / (nextSunrise.getTime() - sunsetTime);
+    } else {
+      // After midnight but before sunrise
+      nightProgress = (current - (sunset.getTime() - 24 * 60 * 60 * 1000)) / 
+                     (sunrise.getTime() - (sunset.getTime() - 24 * 60 * 60 * 1000));
+    }
+    // Map night progress from 270° to 90° (through 360/0)
+    return nightProgress <= 0.5 ? 
+           270 + (nightProgress * 2 * 180) : // First half of night
+           (nightProgress - 0.5) * 2 * 180;  // Second half of night
+  }
+}
+
 async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate: string }> {
   try {
     const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -55,72 +92,50 @@ async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate
   }
 }
 
-function adjustTimeToLocal(utcTime: Date, gmtOffset: number): Date {
-  return new Date(utcTime.getTime() + (gmtOffset * 1000));
-}
-
 export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
   try {
-    // Get coordinates
+    // Get coordinates and local time
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
     const localTime = new Date(timeData.time);
-    const gmtOffset = timeData.timezone?.gmtOffset || 0;
-
+    
     // Get sunrise/sunset times
     const dateStr = localTime.toISOString().split('T')[0];
     const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-
+    
     if (!sunData?.sunrise || !sunData?.sunset) {
-      // Default sunrise/sunset times if API fails
-      const sunrise = new Date(localTime);
-      sunrise.setHours(6, 0, 0, 0);
-      const sunset = new Date(localTime);
-      sunset.setHours(18, 0, 0, 0);
-      sunData.sunrise = sunrise;
-      sunData.sunset = sunset;
+      throw new Error('Failed to get sunrise/sunset times');
     }
 
-    // Calculate time in minutes since midnight
-    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
-    const sunriseMinutes = sunData.sunrise.getHours() * 60 + sunData.sunrise.getMinutes();
-    const sunsetMinutes = sunData.sunset.getHours() * 60 + sunData.sunset.getMinutes();
+    // Calculate rotations
+    const hourRotation = calculateBigArmRotation(
+      localTime,
+      sunData.sunrise,
+      sunData.sunset
+    );
 
-    // Calculate day and night periods
-    const dayLength = sunsetMinutes - sunriseMinutes;
-    const nightLength = 1440 - dayLength; // 24 hours = 1440 minutes
+    // Small arm (minute hand) stays fixed at Aries (90 degrees)
+    const minuteRotation = 90;
 
-    // Calculate hour hand rotation based on 24-hour cycle
-    const totalMinutesInDay = 1440;
-    const hourRotation = (currentMinutes / totalMinutesInDay) * 360;
-    
-    // For Aries position (small hand), use 90 degrees
-    const minuteRotation = 90; // Fixed at Aries position
+    // Format current time
+    const timeString = localTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    // Get zodiac sign
+    const zodiacInfo = await getVedicZodiacSign(localTime);
 
     return {
       hourRotation,
       minuteRotation,
-      currentTime: localTime.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }),
-      zodiacSign: 'Aries',
-      timezone: `GMT${gmtOffset >= 0 ? '+' : ''}${Math.floor(gmtOffset / 3600)}`
+      currentTime: timeString,
+      zodiacSign: zodiacInfo.sign,
+      timezone: `GMT${timeData.timezone?.gmtOffset >= 0 ? '+' : ''}${Math.floor(timeData.timezone?.gmtOffset / 3600)}`
     };
   } catch (error) {
     console.error('Error in calculateRuneTime:', error);
-    // Return default values on error
-    return {
-      hourRotation: 0,
-      minuteRotation: 90, // Fixed Aries position
-      currentTime: new Date().toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }),
-      zodiacSign: 'Aries',
-      timezone: 'GMT+5.5' // Default to India timezone
-    };
+    throw error;
   }
 }
