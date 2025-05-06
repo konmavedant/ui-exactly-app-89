@@ -1,3 +1,4 @@
+
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 import { getLatLngFromLocation } from './locationTime';
 
@@ -31,7 +32,7 @@ export async function calculateRuneTime(
   const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
   const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
 
-  // Calculate Big Arm (Hour) rotation
+  // Calculate Big Arm rotation based on day/night cycle
   let hourRotation;
   if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
     // Day period (90° to 270°)
@@ -51,27 +52,18 @@ export async function calculateRuneTime(
   }
   hourRotation = hourRotation % 360;
 
-  // Calculate Small Arm (Minute) rotation based on moon phase
-  const moonPhase = calculateMoonPhase(now);
-  const minuteRotation = moonPhase * 360;
+  // Calculate Small Arm rotation based on zodiac position
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - yearStart.getTime()) / (24 * 60 * 60 * 1000));
+  const zodiacDegrees = (dayOfYear / 365) * 360;
+
+  // Adjust zodiac rotation to align with traditional dates
+  // Start from Aries (March 21)
+  const zodiacOffset = 80; // Degrees to align with Aries start
+  const minuteRotation = (zodiacDegrees + zodiacOffset) % 360;
 
   return {
     hourRotation,
     minuteRotation
   };
-}
-
-function calculateMoonPhase(date: Date): number {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  // Calculate days since known new moon (Jan 6, 2000)
-  const knownNewMoon = new Date(2000, 0, 6, 18, 14);
-  const current = new Date(year, month - 1, day);
-  const daysSinceNewMoon = (current.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
-
-  // Moon phase cycle is approximately 29.53 days
-  const phase = (daysSinceNewMoon % 29.53) / 29.53;
-  return phase;
 }
