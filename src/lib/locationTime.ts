@@ -36,7 +36,14 @@ export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneRe
   
   try {
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
+    
+    if (!data.date_time_txt || !data.timezone_offset) {
+      throw new Error('Invalid response from timezone API');
+    }
 
     return {
       time: data.date_time_txt,
@@ -46,7 +53,7 @@ export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneRe
     };
   } catch (error) {
     console.error("Error fetching time:", error);
-    throw error;
+    throw new Error(`Failed to fetch local time: ${error.message}`);
   }
 }
 
