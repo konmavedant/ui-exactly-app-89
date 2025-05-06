@@ -89,7 +89,7 @@ const RuneClock: React.FC = () => {
         const { lat, lng } = await getLatLngFromLocation(location_);
         const timeData = await getLocalTime(lat, lng);
         const timeDate = new Date(timeData.time);
-
+        
         setHours(timeDate.getHours());
         setMinutes(timeDate.getMinutes());
         setCurrentTime(format(timeDate, 'hh:mm a'));
@@ -116,19 +116,19 @@ const RuneClock: React.FC = () => {
       try {
         // Get coordinates from location name
         const { lat, lng } = await getLatLngFromLocation(searchInput);
-
+        
         // Get local time for coordinates
         const timeData = await getLocalTime(lat, lng);
-
+        
         // Update location and time
         const [datePart, timePart] = timeData.time.split(' ');
         const [hours, minutes] = timePart.split(':').map(Number);
-
+        
         setLocation(searchInput);
         setHours(hours);
         setMinutes(minutes);
         setCurrentTime(format(new Date().setHours(hours, minutes), 'hh:mm a'));
-
+        
         // Clear search input and blur the input field
         setSearchInput('');
         event.currentTarget.blur();
@@ -167,7 +167,7 @@ const RuneClock: React.FC = () => {
     // Fixed date for May 5, 2025
     const currentDate = new Date('2025-05-05');
     const monthDay = getMonthDay(currentDate);
-
+    
     // For May 5, this should fall in Aries period
     const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
       if (start > end) {
@@ -175,26 +175,12 @@ const RuneClock: React.FC = () => {
       }
       return monthDay >= start && monthDay <= end;
     });
-
-    setZodiacSign('Taurus'); // Corrected Zodiac sign for May 5, 2025
+    
+    setZodiacSign('Aries'); // Force Aries for May 5, 2025
   }, []);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
-  const [rotations, setRotations] = useState({ hourRotation: 0, minuteRotation: 0 });
-
-  useEffect(() => {
-    const updateRotations = async () => {
-      try {
-        const calculatedRotations = await calculateRuneTime(hours, minutes, location_);
-        setRotations(calculatedRotations);
-      } catch (error) {
-        console.error('Error calculating rune time:', error);
-      }
-    };
-    updateRotations();
-  }, [hours, minutes, location_]);
-
-  const { hourRotation, minuteRotation } = rotations;
+  const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut overflow-x-hidden">
@@ -227,7 +213,7 @@ const RuneClock: React.FC = () => {
               <img 
                 src={hourHandImage} 
                 alt="Hour Hand" 
-                className="h-[45%] max-h-[220px] w-auto transform -translate-y-[20%]"
+                className="h-[28%] max-h-[140px] w-auto transform -translate-y-[20%]"
                 style={{ transformOrigin: 'center 50%' }}
               />
             </div>
@@ -241,7 +227,7 @@ const RuneClock: React.FC = () => {
               <img 
                 src={minuteHandImage} 
                 alt="Minute Hand" 
-                className="h-[35%] max-h-[170px] w-auto transform -translate-y-[25%]"
+                className="h-[55%] max-h-[270px] w-auto transform -translate-y-[25%]"
                 style={{ transformOrigin: 'center 50%' }}
               />
             </div>
