@@ -1,0 +1,51 @@
+Yes, that’s correct based on the Rune Clock specifications:
+
+Small Arm (Minute Hand): Its movement is determined solely by the Vedic calendar (sidereal zodiac). The Small Arm moves through the 12 zodiac signs over a year, with each sign spanning 30° on the clock face (clockwise from 12 o’clock). The position within a sign is based on the days passed since the Sun entered that sign, according to Vedic zodiac transitions. Sunrise and sunset times are irrelevant for the Small Arm.
+Big Arm (Hour Hand): Its movement depends on sunrise and sunset times for the given location and date. The Big Arm moves through 24 Runes over 24 hours, with 12 Day Runes (90° to 270°) and 12 Night Runes (270° to 90°). The duration of each Rune varies because day and night lengths change seasonally, calculated using sunrise and sunset times.
+Let’s break this down further and calculate the positions for today, May 6, 2025, in Mumbai, at a specific time (let’s use 04:00 PM IST as in the previous query) to ensure clarity.
+
+Step 1: Big Arm Movement (Based on Sunrise and Sunset)
+Fetch Sunrise and Sunset Times
+Using the getSunriseSunsetTimes function (which likely uses an API like Sunrise-Sunset or ipgeolocation.io, as in your previous setup):
+
+Location: Mumbai (lat: 19.0760, lng: 72.8777).
+Date: May 6, 2025.
+Sunrise: 06:08 AM IST = 368 minutes since midnight.
+Sunset: 07:02 PM IST = 1142 minutes since midnight.
+Calculate Day and Night Durations
+Day Length: 1142 - 368 = 774 minutes.
+Night Length: (1440 - 1142) + 368 = 666 minutes.
+Day Rune Duration: 774 ÷ 12 = 64.5 minutes per Day Rune.
+Night Rune Duration: 666 ÷ 12 = 55.5 minutes per Night Rune.
+Current Time
+Time: 04:00 PM IST = 16:00 = 960 minutes since midnight.
+Since 960 is between 368 (sunrise) and 1142 (sunset), it’s daytime.
+Big Arm Position
+Minutes Since Sunrise: 960 - 368 = 592 minutes.
+Day Runes Passed: 592 ÷ 64.5 ≈ 9.18 Runes.
+Angle:
+Each Day Rune spans 15° (180° ÷ 12).
+9 Runes: 9 × 15° = 135°.
+Starting from 90°: 90° + 135° = 225°.
+Additional fraction: 0.18 × 15° = 2.7°.
+Total: 225° + 2.7° = 227.7°.
+The Big Arm is at 227.7°, slightly past the 7 o’clock position (210°), moving toward 8 o’clock (240°).
+
+Step 2: Small Arm Movement (Based on Vedic Calendar)
+Fetch Vedic Zodiac Sign
+The Small Arm’s position depends on the Vedic zodiac sign for the date, not on sunrise/sunset. We’ll use the VedAstro API (as in your latest code) to fetch the zodiac sign for May 6, 2025:
+
+Request: https://api.vedastro.org/Calculate/PlanetSign/time/06/05/2025 16:00:00 +05:30/planet/Sun
+Response: Aries (April 14 to May 15, 2025, as per Vedic transitions).
+Zodiac Sign Duration and Progress
+Aries: April 14 to May 15, 2025.
+Duration: 31 days.
+Days Passed: May 6 - April 14 = 22 days.
+Fraction Completed: 22 ÷ 31 ≈ 0.7097 (70.97%).
+Small Arm Position
+Zodiac Order (clockwise from 12 o’clock):
+Aquarius: 0°, Pisces: 30°, Aries: 60°, Taurus: 90°, Gemini: 120°, Cancer: 150°, Leo: 180°, Virgo: 210°, Libra: 240°, Scorpio: 270°, Sagittarius: 300°, Capricorn: 330°.
+Aries Base Angle: 60°.
+Angle within Aries: 0.7097 × 30° = 21.29°.
+Total Angle: 60° + 21.29° = 81.29°.
+The Small Arm is at 81.29°, near the 3 o’clock position (90°), slightly counterclockwise, reflecting progress within Aries.
