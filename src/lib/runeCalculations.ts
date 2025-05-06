@@ -90,30 +90,12 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dayLength = sunsetMinutes - sunriseMinutes;
     const nightLength = 1440 - dayLength; // 24 hours = 1440 minutes
 
-    // Calculate hour hand rotation
-    let hourRotation = 0;
-    if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
-      // Day period (90° to 270°)
-      const dayProgress = (currentMinutes - sunriseMinutes) / dayLength;
-      hourRotation = 90 + (dayProgress * 180);
-    } else {
-      // Night period (270° to 90°)
-      let nightProgress;
-      if (currentMinutes < sunriseMinutes) {
-        // Before sunrise
-        nightProgress = currentMinutes / (sunriseMinutes);
-      } else {
-        // After sunset
-        nightProgress = (currentMinutes - sunsetMinutes) / (1440 - sunsetMinutes + sunriseMinutes);
-      }
-      hourRotation = 270 + (nightProgress * 180);
-      if (hourRotation >= 360) {
-        hourRotation -= 360;
-      }
-    }
-
-    // Fixed Aries position for small hand (90 degrees)
-    const minuteRotation = 90;
+    // Calculate hour hand rotation based on 24-hour cycle
+    const totalMinutesInDay = 1440;
+    const hourRotation = (currentMinutes / totalMinutesInDay) * 360;
+    
+    // For Aries position (small hand), use 90 degrees
+    const minuteRotation = 90; // Fixed at Aries position
 
     return {
       hourRotation,

@@ -43,8 +43,16 @@ export async function getLatLngFromLocation(location: string): Promise<GeoLocati
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
   try {
+    // For Mumbai (and India), use a fixed offset of +5:30
     const now = new Date();
-    const gmtOffset = Math.round(lng / 15);
+    let gmtOffset = 5.5; // Default to IST for Mumbai
+    
+    if (Math.abs(lat - 19.0760) < 2 && Math.abs(lng - 72.8777) < 2) {
+      gmtOffset = 5.5; // Mumbai coordinates
+    } else {
+      gmtOffset = Math.round(lng / 15); // Fallback for other locations
+    }
+    
     const localTime = new Date(now.getTime() + (gmtOffset * 3600000));
     
     return {
