@@ -1,6 +1,5 @@
 
-import { getSunrise, getSunset } from 'sunrise-sunset-js';
-import { getLatLngFromLocation } from './locationTime';
+import { getSunriseSunsetTimes, getLatLngFromLocation } from './locationTime';
 
 interface RuneTimeInfluence {
   hourRotation: number;
@@ -28,19 +27,32 @@ function getZodiacSign(date: Date): string {
   return 'Pisces';
 }
 
+function getZodiacAngle(sign: string, date: Date): number {
+  const zodiacStartAngles: { [key: string]: number } = {
+    'Aries': 0, 'Taurus': 30, 'Gemini': 60, 'Cancer': 90,
+    'Leo': 120, 'Virgo': 150, 'Libra': 180, 'Scorpio': 210,
+    'Sagittarius': 240, 'Capricorn': 270, 'Aquarius': 300, 'Pisces': 330
+  };
+
+  const baseAngle = zodiacStartAngles[sign];
+  const daysInSign = 30; // Approximate
+  const dayOfMonth = date.getDate();
+  const progressInSign = (dayOfMonth / daysInSign) * 30;
+
+  return (baseAngle + progressInSign) % 360;
+}
+
 export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
   try {
     const { lat, lng } = await getLatLngFromLocation(location);
     const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
     
-    // Get sunrise and sunset times for the current date
-    const sunrise = getSunrise(lat, lng, now);
-    const sunset = getSunset(lat, lng, now);
-
-    // Convert current time to minutes since midnight
+    // Get sunrise and sunset times
+    const { sunrise, sunset } = await getSunriseSunsetTimes(lat, lng, dateStr);
+    
+    // Convert all times to minutes since midnight
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    
-    // Convert sunrise and sunset to minutes since midnight
     const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
     const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
 
@@ -57,8 +69,8 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
       // Day time - lower half of clock (90° to 270°)
       const minutesIntoDaylight = currentMinutes - sunriseMinutes;
-      const dayProgress = minutesIntoDaylight / dayDuration;
-      hourRotation = 90 + (dayProgress * 180);
+      const runesPassed = minutesIntoDaylight / dayRuneDuration;
+      hourRotation = 90 + (runesPassed * 15);
     } else {
       // Night time - upper half of clock (270° to 90°)
       let minutesIntoNight;
@@ -67,17 +79,13 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       } else {
         minutesIntoNight = currentMinutes - sunsetMinutes;
       }
-      const nightProgress = minutesIntoNight / nightDuration;
-      hourRotation = 270 + (nightProgress * 180);
+      const runesPassed = minutesIntoNight / nightRuneDuration;
+      hourRotation = 270 + (runesPassed * 15);
     }
 
     // Calculate Small Arm (zodiac) rotation
-    // One complete rotation per year (365 days)
-    const startOfYear = new Date(now.getFullYear(), 0, 0);
-    const diff = now.getTime() - startOfYear.getTime();
-    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const yearProgress = dayOfYear / 365;
-    const minuteRotation = yearProgress * 360;
+    const zodiacSign = getZodiacSign(now);
+    const minuteRotation = getZodiacAngle(zodiacSign, now);
 
     // Format time for display
     const timeString = now.toLocaleTimeString('en-US', {
@@ -90,7 +98,7 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       hourRotation: hourRotation % 360,
       minuteRotation: minuteRotation % 360,
       currentTime: timeString,
-      zodiacSign: getZodiacSign(now),
+      zodiacSign: zodiacSign,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
   } catch (error) {

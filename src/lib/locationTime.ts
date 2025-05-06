@@ -12,48 +12,62 @@ interface GeoLocation {
 }
 
 export async function getLatLngFromLocation(location: string): Promise<GeoLocation> {
-  const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
-  if (!OPENCAGE_API_KEY) {
-    console.error("OpenCage API key is missing. Please check your environment variables.");
-    throw new Error("OpenCage API key not found");
-  }
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
   
-  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${OPENCAGE_API_KEY}`;
-  
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'RuneClockApp/1.0'
+    }
+  });
   const data = await response.json();
 
-  if (data.results && data.results.length > 0) {
-    const { lat, lng } = data.results[0].geometry;
-    return { lat, lng };
+  if (data && data.length > 0) {
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon)
+    };
   }
   throw new Error("Location not found");
 }
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
-  const TIMEZONE_API_KEY = import.meta.env.VITE_TIMEZONE_API_KEY;
-  if (!TIMEZONE_API_KEY) {
-    console.error("TimeZoneDB API key is missing. Please check your environment variables.");
-    throw new Error("TimeZoneDB API key not found");
-  }
-
+  const API_KEY = 'c89e8967f04d4d0f86e91b4be385b830';
+  const url = `https://api.ipgeolocation.io/timezone?apiKey=${API_KEY}&lat=${lat}&long=${lng}`;
+  
   try {
-    const url = `https://api.timezonedb.com/v2.1/get-time-zone?key=${TIMEZONE_API_KEY}&format=json&by=position&lat=${lat}&lng=${lng}`;
-    
     const response = await fetch(url);
     const data = await response.json();
 
-    if (data.status === 'OK') {
-      return {
-        time: new Date(data.formatted).toLocaleString(),
-        timezone: {
-          gmtOffset: data.gmtOffset
-        }
-      };
-    }
-    throw new Error("Time data not available");
+    return {
+      time: data.date_time_txt,
+      timezone: {
+        gmtOffset: parseInt(data.timezone_offset) * 3600
+      }
+    };
   } catch (error) {
     console.error("Error fetching time:", error);
+    throw error;
+  }
+}
+
+interface SunriseSunsetData {
+  sunrise: Date;
+  sunset: Date;
+}
+
+export async function getSunriseSunsetTimes(lat: number, lng: number, date: string): Promise<SunriseSunsetData> {
+  const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${date}&formatted=0`;
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    return {
+      sunrise: new Date(data.results.sunrise),
+      sunset: new Date(data.results.sunset)
+    };
+  } catch (error) {
+    console.error("Error fetching sunrise/sunset times:", error);
     throw error;
   }
 }
