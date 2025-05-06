@@ -1,6 +1,5 @@
 
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
-import { OpenCage } from 'opencage-api-client';
 
 interface RuneTimeInfluence {
   hourRotation: number;
