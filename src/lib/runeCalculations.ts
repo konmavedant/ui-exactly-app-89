@@ -1,4 +1,3 @@
-
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 import { getLatLngFromLocation } from './locationTime';
 
@@ -16,7 +15,7 @@ interface LocationTime {
 function getZodiacSign(lat: number, lng: number, date: Date): string {
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  
+
   if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
   if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
   if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
@@ -35,14 +34,14 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
   try {
     const { lat, lng } = await getLatLngFromLocation(location);
     const now = new Date();
-    
+
     // Get actual sunrise and sunset times
     const sunrise = getSunrise(lat, lng, now);
     const sunset = getSunset(lat, lng, now);
 
     // Convert to local time
     const localTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
-    
+
     // Calculate current minutes since midnight
     const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
     const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
@@ -76,10 +75,14 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
     const minuteRotation = (dayOfYear / daysInYear) * 360;
 
+    // Format time to show only hours and minutes
+    const formattedTime = localTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+
+
     return {
       hourRotation: hourRotation % 360,
       minuteRotation: minuteRotation % 360,
-      currentTime: localTime.toLocaleTimeString(),
+      currentTime: formattedTime,
       zodiacSign: getZodiacSign(lat, lng, now),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
