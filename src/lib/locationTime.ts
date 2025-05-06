@@ -41,14 +41,17 @@ export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneRe
     }
     const data = await response.json();
     
-    if (!data.date_time_txt || !data.timezone_offset) {
-      throw new Error('Invalid response from timezone API');
+    if (!data.date_time_txt) {
+      throw new Error('Missing date_time_txt in API response');
     }
+
+    // Ensure we have a valid timezone offset, default to 0 if missing
+    const gmtOffset = data.timezone_offset ? parseInt(data.timezone_offset) : 0;
 
     return {
       time: data.date_time_txt,
       timezone: {
-        gmtOffset: parseInt(data.timezone_offset) * 3600
+        gmtOffset: gmtOffset * 3600 // Convert to seconds
       }
     };
   } catch (error) {

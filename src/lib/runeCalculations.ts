@@ -39,8 +39,8 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     // Get coordinates and current time for location
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
-    
-    if (!timeData.time) {
+
+    if (!timeData || !timeData.time) {
       throw new Error("Invalid time data received");
     }
 
@@ -49,7 +49,12 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dateStr = now.toISOString().split('T')[0];
 
     // Get sunrise and sunset times
-    const { sunrise, sunset } = await getSunriseSunsetTimes(lat, lng, dateStr);
+    const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
+    if (!sunData || !sunData.sunrise || !sunData.sunset) {
+      throw new Error('Invalid sunrise/sunset data received');
+    }
+    const { sunrise, sunset } = sunData;
+
 
     // Convert all times to minutes since midnight
     const currentMinutes = getMinutesSinceMidnight(now);
@@ -86,17 +91,17 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     // Calculate Minute Hand (zodiac) rotation
     const zodiacSign = getZodiacSignForDate(now);
     const dayOfMonth = now.getDate();
-    
+
     // Calculate precise position within zodiac sign
     const zodiacSigns = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 
                          'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
     const signIndex = zodiacSigns.indexOf(zodiacSign);
-    
+
     // Each zodiac sign spans 30 degrees
     const baseAngle = signIndex * 30;
     // Calculate progress within the current sign (0-30 degrees)
     const progressInSign = (dayOfMonth / 30) * 30;
-    
+
     // Final rotation combines base angle of sign and progress within it
     const minuteRotation = (baseAngle + progressInSign) % 360;
 
