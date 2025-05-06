@@ -94,28 +94,25 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     // Calculate day and night periods in minutes
     const dayStart = sunrise.getHours() * 60 + sunrise.getMinutes();
     const dayEnd = sunset.getHours() * 60 + sunset.getMinutes();
-    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
+    const totalMinutesSinceMidnight = localTime.getHours() * 60 + localTime.getMinutes();
     
     // Calculate Big Arm rotation
-    let hourRotation: number;
     const dayLength = dayEnd - dayStart;
     const nightLength = 1440 - dayLength;
-    const currentHour = localTime.getHours();
-    const currentMinute = localTime.getMinutes();
-    const currentMinutes = currentHour * 60 + currentMinute;
+    let hourRotation: number;
 
-    if (currentMinutes >= dayStart && currentMinutes <= dayEnd) {
+    if (totalMinutesSinceMidnight >= dayStart && totalMinutesSinceMidnight <= dayEnd) {
       // Daytime calculation (90° to 270°)
-      const minutesIntoDaytime = currentMinutes - dayStart;
+      const minutesIntoDaytime = totalMinutesSinceMidnight - dayStart;
       const dayProgress = minutesIntoDaytime / dayLength;
       hourRotation = 90 + (dayProgress * 180);
     } else {
       // Nighttime calculation (270° to 90°)
       let minutesIntoNight;
-      if (currentMinutes < dayStart) {
-        minutesIntoNight = currentMinutes + (1440 - dayEnd);
+      if (totalMinutesSinceMidnight < dayStart) {
+        minutesIntoNight = totalMinutesSinceMidnight + (1440 - dayEnd);
       } else {
-        minutesIntoNight = currentMinutes - dayEnd;
+        minutesIntoNight = totalMinutesSinceMidnight - dayEnd;
       }
       const nightProgress = minutesIntoNight / nightLength;
       hourRotation = 270 + (nightProgress * 180);
@@ -124,12 +121,9 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       }
     }
 
-    // Calculate Small Arm (zodiac) position
-    const zodiacData = await getVedicZodiacSign(localTime);
-    const signIndex = VEDIC_ZODIAC_SIGNS.indexOf(zodiacData.sign);
-    // For Aries (fixed position as requested)
-    const signIndex = VEDIC_ZODIAC_SIGNS.indexOf('Aries');
-    const baseAngle = signIndex * 30;
+    // Calculate Small Arm (zodiac) position - fixed at Aries
+    const ariesIndex = VEDIC_ZODIAC_SIGNS.indexOf('Aries');
+    const baseAngle = ariesIndex * 30;
     const minuteRotation = baseAngle; // Fixed at Aries position
 
     return {
@@ -140,7 +134,7 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
         minute: '2-digit',
         hour12: true
       }),
-      zodiacSign: zodiacData.sign,
+      zodiacSign: 'Aries',
       timezone: `GMT${gmtOffset >= 0 ? '+' : ''}${gmtOffset / 3600}`
     };
   } catch (error) {
