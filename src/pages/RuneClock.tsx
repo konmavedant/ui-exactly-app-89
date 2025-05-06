@@ -180,7 +180,21 @@ const RuneClock: React.FC = () => {
   }, []);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
-  const { hourRotation, minuteRotation } = calculateRuneTime(hours, minutes, zodiacSign, location_, dateOfBirth);
+  const [rotations, setRotations] = useState({ hourRotation: 0, minuteRotation: 0 });
+
+  useEffect(() => {
+    const updateRotations = async () => {
+      try {
+        const calculatedRotations = await calculateRuneTime(hours, minutes, location_);
+        setRotations(calculatedRotations);
+      } catch (error) {
+        console.error('Error calculating rune time:', error);
+      }
+    };
+    updateRotations();
+  }, [hours, minutes, location_]);
+
+  const { hourRotation, minuteRotation } = rotations;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#231F20] text-white font-inknut overflow-x-hidden">
