@@ -84,22 +84,22 @@ const RuneClock: React.FC = () => {
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    const updateTime = async () => {
+    const updateRuneClock = async () => {
       try {
-        const { lat, lng } = await getLatLngFromLocation(location_);
-        const timeData = await getLocalTime(lat, lng);
-        const timeDate = new Date(timeData.time);
-        
-        setHours(timeDate.getHours());
-        setMinutes(timeDate.getMinutes());
-        setCurrentTime(format(timeDate, 'hh:mm a'));
+        const runeData = await calculateRuneTime(location_);
+        setCurrentTime(runeData.currentTime);
+        setZodiacSign(runeData.zodiacSign);
+        setRotations({
+          hourRotation: runeData.hourRotation,
+          minuteRotation: runeData.minuteRotation
+        });
       } catch (error) {
-        console.error('Error fetching location time:', error);
+        console.error('Error updating rune clock:', error);
       }
     };
 
-    updateTime();
-    intervalId = setInterval(updateTime, 60000);
+    updateRuneClock();
+    intervalId = setInterval(updateRuneClock, 60000);
 
     return () => {
       if (intervalId) clearInterval(intervalId);
