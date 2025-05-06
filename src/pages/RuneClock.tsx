@@ -133,22 +133,23 @@ const RuneClock: React.FC = () => {
   const handleSearchSubmit = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && searchInput.length > 2) {
       try {
-        // Get coordinates from location name
         const { lat, lng } = await getLatLngFromLocation(searchInput);
-        
-        // Get local time for coordinates
         const timeData = await getLocalTime(lat, lng);
+        const localTime = new Date(timeData.time);
         
-        // Update location and time
-        const [datePart, timePart] = timeData.time.split(' ');
-        const [hours, minutes] = timePart.split(':').map(Number);
+        setLocation(searchInput.split(',')[0]); // Only take the city name
+        setHours(localTime.getHours());
+        setMinutes(localTime.getMinutes());
+        setCurrentTime(localTime.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }));
         
-        setLocation(searchInput);
-        setHours(hours);
-        setMinutes(minutes);
-        setCurrentTime(format(new Date().setHours(hours, minutes), 'hh:mm a'));
+        const month = localTime.getMonth() + 1;
+        const day = localTime.getDate();
+        setZodiacSign(getZodiacSign(localTime));
         
-        // Clear search input and blur the input field
         setSearchInput('');
         event.currentTarget.blur();
       } catch (error) {
@@ -276,13 +277,12 @@ const RuneClock: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center -mt-8 space-y-2">
+        <div className="text-center -mt-8 space-y-4">
           <h2 className="text-2xl font-bold text-appYellow">{location_}</h2>
           <h3 className="text-4xl font-bold text-white">
             {currentTime || ''}
           </h3>
-          <p className="text-lg text-gray-400">{country}</p>
-          <h3 className="text-xl font-bold text-appYellow mt-2">Zodiac Sign: {zodiacSign}</h3>
+          <h3 className="text-xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 

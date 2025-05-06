@@ -12,30 +12,39 @@ interface GeoLocation {
 }
 
 export async function getLatLngFromLocation(location: string): Promise<GeoLocation> {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'RuneClockApp/1.0'
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'RuneClockApp/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  });
-  const data = await response.json();
+    
+    const data = await response.json();
 
-  if (data && data.length > 0) {
+    if (!data || data.length === 0) {
+      throw new Error("Location not found");
+    }
+
     return {
       lat: parseFloat(data[0].lat),
       lng: parseFloat(data[0].lon)
     };
+  } catch (error) {
+    console.error("Error fetching location:", error);
+    throw error;
   }
-  throw new Error("Location not found");
 }
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
   try {
-    // Use the system time and calculate offset based on longitude
     const now = new Date();
-    const gmtOffset = Math.round(lng / 15); // Approximate timezone offset
-    
+    const gmtOffset = Math.round(lng / 15);
     const localTime = new Date(now.getTime() + (gmtOffset * 3600000));
     
     return {
@@ -45,22 +54,25 @@ export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneRe
       }
     };
   } catch (error) {
-    console.error("Error fetching time:", error);
-    throw new Error(`Failed to fetch local time: ${error.message}`);
+    console.error("Error getting local time:", error);
+    throw error;
   }
 }
 
-interface SunriseSunsetData {
-  sunrise: Date;
-  sunset: Date;
-}
-
-export async function getSunriseSunsetTimes(lat: number, lng: number, date: string): Promise<SunriseSunsetData> {
-  const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${date}&formatted=0`;
-  
+export async function getSunriseSunsetTimes(lat: number, lng: number, date: string): Promise<{ sunrise: Date; sunset: Date }> {
   try {
+    const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${date}&formatted=0`;
     const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch sunrise/sunset data');
+    }
+    
     const data = await response.json();
+    
+    if (!data.results) {
+      throw new Error('Invalid sunrise/sunset data');
+    }
     
     return {
       sunrise: new Date(data.results.sunrise),
