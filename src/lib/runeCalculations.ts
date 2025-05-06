@@ -74,12 +74,19 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     // Get coordinates and time data
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
+    if (!timeData || !timeData.time) {
+      throw new Error("Invalid time data received");
+    }
+    
     const localTime = new Date(timeData.time);
+    const gmtOffset = timeData.timezone?.gmtOffset || 0;
     
     // Get sunrise/sunset times and adjust to local timezone
     const dateStr = localTime.toISOString().split('T')[0];
     const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-    const gmtOffset = timeData.timezone.gmtOffset;
+    if (!sunData || !sunData.sunrise || !sunData.sunset) {
+      throw new Error("Invalid sunrise/sunset data");
+    }
     
     const sunrise = adjustTimeToLocal(new Date(sunData.sunrise), gmtOffset);
     const sunset = adjustTimeToLocal(new Date(sunData.sunset), gmtOffset);
@@ -93,6 +100,9 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     let hourRotation: number;
     const dayLength = dayEnd - dayStart;
     const nightLength = 1440 - dayLength;
+    const currentHour = localTime.getHours();
+    const currentMinute = localTime.getMinutes();
+    const currentMinutes = currentHour * 60 + currentMinute;
 
     if (currentMinutes >= dayStart && currentMinutes <= dayEnd) {
       // Daytime calculation (90° to 270°)
@@ -109,18 +119,18 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       }
       const nightProgress = minutesIntoNight / nightLength;
       hourRotation = 270 + (nightProgress * 180);
+      if (hourRotation >= 360) {
+        hourRotation -= 360;
+      }
     }
 
     // Calculate Small Arm (zodiac) position
     const zodiacData = await getVedicZodiacSign(localTime);
     const signIndex = VEDIC_ZODIAC_SIGNS.indexOf(zodiacData.sign);
-    const signEntryDate = new Date(zodiacData.entryDate);
-    const daysSinceEntry = Math.floor((localTime.getTime() - signEntryDate.getTime()) / (1000 * 60 * 60 * 24));
-    const daysInSign = 30; // Approximate days in each sign
-    const progressInSign = Math.min(daysSinceEntry / daysInSign, 1);
+    // For Aries (fixed position as requested)
+    const signIndex = VEDIC_ZODIAC_SIGNS.indexOf('Aries');
     const baseAngle = signIndex * 30;
-    const progressAngle = progressInSign * 30;
-    const minuteRotation = (baseAngle + progressAngle) % 360;
+    const minuteRotation = baseAngle; // Fixed at Aries position
 
     return {
       hourRotation: hourRotation % 360,
