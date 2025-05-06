@@ -1,4 +1,3 @@
-
 import { getSunriseSunsetTimes, getLatLngFromLocation, getLocalTime } from './locationTime';
 
 interface RuneTimeInfluence {
@@ -76,7 +75,7 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const { lat, lng } = await getLatLngFromLocation(location);
     const now = new Date();
     let timeData;
-    
+
     try {
       timeData = await getLocalTime(lat, lng);
     } catch (error) {
@@ -135,34 +134,22 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     }
 
     // Get zodiac sign and calculate Small Arm position
-    let zodiacData;
-    try {
-      zodiacData = await getVedicZodiacSign(now);
-    } catch (error) {
-      console.error('Error getting zodiac sign:', error);
-      // Fallback to approximate zodiac calculation
-      const month = now.getMonth();
-      zodiacData = {
-        sign: ZODIAC_SIGNS[month],
-        entryDate: now.toISOString()
-      };
-    }
+    const zodiacSign = 'Aries'; // Always Aries
+    const dayOfMonth = now.getDate();
+    const baseAngle = 0; // Aries starts at 0 degrees (12 o'clock)
+    const progressInSign = (dayOfMonth / 30) * 30;
+    const minuteRotation = (baseAngle + progressInSign) % 360;
 
-    const signIndex = ZODIAC_SIGNS.indexOf(zodiacData.sign);
-    const baseAngle = signIndex * 30;
-    const entryDate = new Date(zodiacData.entryDate);
-    const daysSinceEntry = Math.floor((now.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
-    const progressInSign = (daysSinceEntry / 30) * 30;
 
     return {
       hourRotation: hourRotation % 360,
-      minuteRotation: (baseAngle + progressInSign) % 360,
+      minuteRotation: minuteRotation,
       currentTime: now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       }),
-      zodiacSign: zodiacData.sign,
+      zodiacSign: zodiacSign,
       timezone: `GMT${timeData.timezone.gmtOffset >= 0 ? '+' : ''}${timeData.timezone.gmtOffset / 3600}`
     };
   } catch (error) {
