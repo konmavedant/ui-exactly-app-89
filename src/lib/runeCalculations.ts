@@ -62,12 +62,20 @@ function getZodiacSignForDate(date: Date): string {
 
 export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
   try {
+    if (!location) {
+      throw new Error("Location is required");
+    }
+
+    // Get coordinates
     const { lat, lng } = await getLatLngFromLocation(location);
-    const { time } = await getLocalTime(lat, lng);
-    const now = new Date(time);
+    
+    // Get local time
+    const timeData = await getLocalTime(lat, lng);
+    const now = new Date(timeData.time);
     const dateStr = now.toISOString().split('T')[0];
     
     // Get sunrise and sunset times
+    const { sunrise, sunset } = await getSunriseSunsetTimes(lat, lng, dateStr);
     const { sunrise, sunset } = await getSunriseSunsetTimes(lat, lng, dateStr);
     
     // Convert all times to minutes since midnight
@@ -114,13 +122,18 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     });
 
     return {
-      hourRotation: hourRotation % 360,
-      minuteRotation: minuteRotation % 360,
-      currentTime: timeString,
+      hourRotation: (hourRotation || 0) % 360,
+      minuteRotation: (minuteRotation || 0) % 360,
+      currentTime: now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }),
       zodiacSign: getZodiacSignForDate(now),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      timezone: timeData.timezone?.gmtOffset ? `GMT${timeData.timezone.gmtOffset >= 0 ? '+' : ''}${timeData.timezone.gmtOffset / 3600}` : 'GMT'
     };
   } catch (error) {
+    console.error('Error in calculateRuneTime:', error);
     console.error('Error calculating rune time:', error);
     throw error;
   }
