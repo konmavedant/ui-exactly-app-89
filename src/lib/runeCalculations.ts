@@ -8,22 +8,44 @@ interface RuneTimeInfluence {
   timezone: string;
 }
 
-function getZodiacSignForDate(date: Date): string {
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
-  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
-  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
-  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
-  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
-  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
-  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
-  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
-  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
-  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
-  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
-  return 'Pisces';
+async function getZodiacSignForDate(date: Date): Promise<string> {
+  try {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dateStr = `${month}-${day}-${date.getFullYear()}`;
+    
+    const response = await fetch('https://aztro.sameerkumar.website/zodiac', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        date: dateStr
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch zodiac sign');
+    }
+    
+    const data = await response.json();
+    return data.zodiac_sign;
+  } catch (error) {
+    console.error('Error fetching zodiac sign:', error);
+    // Fallback to calculation if API fails
+    if ((date.getMonth() + 1 === 3 && date.getDate() >= 21) || (date.getMonth() + 1 === 4 && date.getDate() <= 19)) return 'Aries';
+    if ((date.getMonth() + 1 === 4 && date.getDate() >= 20) || (date.getMonth() + 1 === 5 && date.getDate() <= 20)) return 'Taurus';
+    if ((date.getMonth() + 1 === 5 && date.getDate() >= 21) || (date.getMonth() + 1 === 6 && date.getDate() <= 20)) return 'Gemini';
+    if ((date.getMonth() + 1 === 6 && date.getDate() >= 21) || (date.getMonth() + 1 === 7 && date.getDate() <= 22)) return 'Cancer';
+    if ((date.getMonth() + 1 === 7 && date.getDate() >= 23) || (date.getMonth() + 1 === 8 && date.getDate() <= 22)) return 'Leo';
+    if ((date.getMonth() + 1 === 8 && date.getDate() >= 23) || (date.getMonth() + 1 === 9 && date.getDate() <= 22)) return 'Virgo';
+    if ((date.getMonth() + 1 === 9 && date.getDate() >= 23) || (date.getMonth() + 1 === 10 && date.getDate() <= 22)) return 'Libra';
+    if ((date.getMonth() + 1 === 10 && date.getDate() >= 23) || (date.getMonth() + 1 === 11 && date.getDate() <= 21)) return 'Scorpio';
+    if ((date.getMonth() + 1 === 11 && date.getDate() >= 22) || (date.getMonth() + 1 === 12 && date.getDate() <= 21)) return 'Sagittarius';
+    if ((date.getMonth() + 1 === 12 && date.getDate() >= 22) || (date.getMonth() + 1 === 1 && date.getDate() <= 19)) return 'Capricorn';
+    if ((date.getMonth() + 1 === 1 && date.getDate() >= 20) || (date.getMonth() + 1 === 2 && date.getDate() <= 18)) return 'Aquarius';
+    return 'Pisces';
+  }
 }
 
 function getMinutesSinceMidnight(date: Date): number {
@@ -89,7 +111,7 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     }
 
     // Calculate Minute Hand (zodiac) rotation
-    const zodiacSign = getZodiacSignForDate(now);
+    const zodiacSign = await getZodiacSignForDate(now);
     const dayOfMonth = now.getDate();
 
     // Calculate precise position within zodiac sign
