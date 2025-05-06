@@ -8,43 +8,22 @@ interface RuneTimeInfluence {
   timezone: string;
 }
 
-async function getZodiacSignForDate(date: Date): Promise<string> {
+async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate: string }> {
+  const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:00 +05:30`;
+
   try {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const dateStr = `${month}-${day}-${date.getFullYear()}`;
-    
-    const response = await fetch('https://aztro.sameerkumar.website/zodiac', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        date: dateStr
-      })
-    });
-    
+    const response = await fetch(`https://api.vedastro.org/Calculate/PlanetSign/time/${formattedDate}/planet/Sun`);
     if (!response.ok) {
-      throw new Error('Failed to fetch zodiac sign');
+      throw new Error('Failed to fetch Vedic zodiac sign');
     }
-    
     const data = await response.json();
-    return data.zodiac_sign;
+    return {
+      sign: data.zodiacSign,
+      entryDate: data.signEntryDate
+    };
   } catch (error) {
-    console.error('Error fetching zodiac sign:', error);
-    // Fallback to calculation if API fails
-    if ((date.getMonth() + 1 === 3 && date.getDate() >= 21) || (date.getMonth() + 1 === 4 && date.getDate() <= 19)) return 'Aries';
-    if ((date.getMonth() + 1 === 4 && date.getDate() >= 20) || (date.getMonth() + 1 === 5 && date.getDate() <= 20)) return 'Taurus';
-    if ((date.getMonth() + 1 === 5 && date.getDate() >= 21) || (date.getMonth() + 1 === 6 && date.getDate() <= 20)) return 'Gemini';
-    if ((date.getMonth() + 1 === 6 && date.getDate() >= 21) || (date.getMonth() + 1 === 7 && date.getDate() <= 22)) return 'Cancer';
-    if ((date.getMonth() + 1 === 7 && date.getDate() >= 23) || (date.getMonth() + 1 === 8 && date.getDate() <= 22)) return 'Leo';
-    if ((date.getMonth() + 1 === 8 && date.getDate() >= 23) || (date.getMonth() + 1 === 9 && date.getDate() <= 22)) return 'Virgo';
-    if ((date.getMonth() + 1 === 9 && date.getDate() >= 23) || (date.getMonth() + 1 === 10 && date.getDate() <= 22)) return 'Libra';
-    if ((date.getMonth() + 1 === 10 && date.getDate() >= 23) || (date.getMonth() + 1 === 11 && date.getDate() <= 21)) return 'Scorpio';
-    if ((date.getMonth() + 1 === 11 && date.getDate() >= 22) || (date.getMonth() + 1 === 12 && date.getDate() <= 21)) return 'Sagittarius';
-    if ((date.getMonth() + 1 === 12 && date.getDate() >= 22) || (date.getMonth() + 1 === 1 && date.getDate() <= 19)) return 'Capricorn';
-    if ((date.getMonth() + 1 === 1 && date.getDate() >= 20) || (date.getMonth() + 1 === 2 && date.getDate() <= 18)) return 'Aquarius';
-    return 'Pisces';
+    console.error('Error fetching Vedic zodiac:', error);
+    throw error;
   }
 }
 
@@ -58,46 +37,36 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       throw new Error("Location is required");
     }
 
-    // Get coordinates and current time for location
+    // Get coordinates and local time
     const { lat, lng } = await getLatLngFromLocation(location);
     const timeData = await getLocalTime(lat, lng);
-
-    if (!timeData || !timeData.time) {
-      throw new Error("Invalid time data received");
-    }
-
-    // Create date object from location's current time
     const now = new Date(timeData.time);
     const dateStr = now.toISOString().split('T')[0];
 
     // Get sunrise and sunset times
     const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-    if (!sunData || !sunData.sunrise || !sunData.sunset) {
-      throw new Error('Invalid sunrise/sunset data received');
-    }
     const { sunrise, sunset } = sunData;
 
-
-    // Convert all times to minutes since midnight
+    // Calculate minutes since midnight for all times
     const currentMinutes = getMinutesSinceMidnight(now);
     const sunriseMinutes = getMinutesSinceMidnight(sunrise);
     const sunsetMinutes = getMinutesSinceMidnight(sunset);
 
     // Calculate day and night durations
     const dayDuration = sunsetMinutes - sunriseMinutes;
-    const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
+    const nightDuration = 1440 - dayDuration;
 
-    // Each rune represents 1/12 of day or night
+    // Calculate Rune durations
     const dayRuneDuration = dayDuration / 12;
     const nightRuneDuration = nightDuration / 12;
 
-    // Calculate Hour Hand (Big Arm) rotation
+    // Calculate Big Arm (Hour Hand) rotation
     let hourRotation = 0;
     if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
       // Daytime - calculate position in lower half (90° to 270°)
       const minutesIntoDaylight = currentMinutes - sunriseMinutes;
-      const progressThroughDay = minutesIntoDaylight / dayDuration;
-      hourRotation = 90 + (progressThroughDay * 180);
+      const runesPassed = minutesIntoDaylight / dayRuneDuration;
+      hourRotation = 90 + (runesPassed * 15); // Each rune is 15 degrees (180/12)
     } else {
       // Nighttime - calculate position in upper half (270° to 90°)
       let minutesIntoNight;
@@ -106,36 +75,35 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       } else {
         minutesIntoNight = currentMinutes - sunsetMinutes;
       }
-      const progressThroughNight = minutesIntoNight / nightDuration;
-      hourRotation = 270 + (progressThroughNight * 180);
+      const runesPassed = minutesIntoNight / nightRuneDuration;
+      hourRotation = 270 + (runesPassed * 15);
     }
 
-    // Calculate Minute Hand (zodiac) rotation based on current date
-    const zodiacSign = await getZodiacSignForDate(now);
-    const dayOfMonth = now.getDate();
+    // Get Vedic zodiac sign and calculate Small Arm position
+    const zodiacData = await getVedicZodiacSign(now);
+    const zodiacSigns = ['Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer', 
+                        'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'];
 
-    // Fixed zodiac positions in the clock (counter-clockwise from 3 o'clock)
-    const zodiacSigns = ['Aries', 'Pisces', 'Aquarius', 'Capricorn', 'Sagittarius', 'Scorpio',
-                        'Libra', 'Virgo', 'Leo', 'Cancer', 'Gemini', 'Taurus'];
-    const signIndex = zodiacSigns.indexOf(zodiacSign);
+    const signIndex = zodiacSigns.indexOf(zodiacData.sign);
+    const baseAngle = signIndex * 30; // Each sign spans 30 degrees
 
-    // Each zodiac sign spans 30 degrees, starting from 0° at 3 o'clock
-    const baseAngle = signIndex * 30;
-    // Calculate progress within the current sign (0-30 degrees)
-    const progressInSign = (dayOfMonth / 30) * 30;
+    // Calculate progress within the sign
+    const entryDate = new Date(zodiacData.entryDate);
+    const daysSinceEntry = Math.floor((now.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+    const progressInSign = (daysSinceEntry / 30) * 30; // Assume 30 days per sign
 
-    // Final rotation combines base angle of sign and progress within it
+    // Final rotation for Small Arm
     const minuteRotation = (baseAngle + progressInSign) % 360;
 
     return {
       hourRotation: hourRotation % 360,
-      minuteRotation: minuteRotation % 360,
+      minuteRotation,
       currentTime: now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       }),
-      zodiacSign,
+      zodiacSign: zodiacData.sign,
       timezone: `GMT${timeData.timezone.gmtOffset >= 0 ? '+' : ''}${timeData.timezone.gmtOffset / 3600}`
     };
   } catch (error) {
