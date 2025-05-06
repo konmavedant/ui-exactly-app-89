@@ -71,90 +71,66 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       throw new Error("Location is required");
     }
 
-    // Get coordinates and local time
+    // Get coordinates
     const { lat, lng } = await getLatLngFromLocation(location);
     const now = new Date();
-    let timeData;
-
-    try {
-      timeData = await getLocalTime(lat, lng);
-    } catch (error) {
-      console.error('Error fetching local time:', error);
-      // Fallback to browser's local time
-      timeData = {
-        time: now.toISOString(),
-        timezone: { gmtOffset: now.getTimezoneOffset() * -60 }
-      };
-    }
-
     const dateStr = now.toISOString().split('T')[0];
 
-    // Get sunrise and sunset times with fallback
-    let sunrise = new Date(now);
-    let sunset = new Date(now);
-    try {
-      const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
-      sunrise = sunData.sunrise;
-      sunset = sunData.sunset;
-    } catch (error) {
-      console.error('Error fetching sun times:', error);
-      // Fallback to approximate times
-      sunrise.setHours(6, 0, 0);
-      sunset.setHours(18, 0, 0);
-    }
+    // Get sunrise and sunset times
+    const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
+    const sunrise = new Date(sunData.sunrise);
+    const sunset = new Date(sunData.sunset);
 
-    // Calculate minutes since midnight
-    const currentMinutes = getMinutesSinceMidnight(now);
-    const sunriseMinutes = getMinutesSinceMidnight(sunrise);
-    const sunsetMinutes = getMinutesSinceMidnight(sunset);
+    // Get local time data
+    const timeData = await getLocalTime(lat, lng);
+    const localTime = new Date(timeData.time);
 
-    // Calculate day and night durations
-    const dayDuration = sunsetMinutes - sunriseMinutes;
-    const nightDuration = 1440 - dayDuration;
+    // Calculate day and night periods
+    const dayStart = sunrise.getHours() * 60 + sunrise.getMinutes();
+    const dayEnd = sunset.getHours() * 60 + sunset.getMinutes();
+    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
 
-    // Calculate Rune durations
-    const dayRuneDuration = dayDuration / 12;
-    const nightRuneDuration = nightDuration / 12;
+    // Calculate big arm (hour hand) rotation
+    let hourRotation;
+    const dayLength = dayEnd - dayStart;
+    const nightLength = 1440 - dayLength;
 
-    // Calculate Big Arm (Hour Hand) rotation
-    let hourRotation = 0;
-    if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
-      const minutesIntoDaylight = currentMinutes - sunriseMinutes;
-      const runesPassed = minutesIntoDaylight / dayRuneDuration;
-      hourRotation = 90 + (runesPassed * 15);
+    if (currentMinutes >= dayStart && currentMinutes <= dayEnd) {
+      // Day time calculation (90° to 270°)
+      const minutesIntoDaytime = currentMinutes - dayStart;
+      const dayProgress = minutesIntoDaytime / dayLength;
+      hourRotation = 90 + (dayProgress * 180);
     } else {
+      // Night time calculation (270° to 90°)
       let minutesIntoNight;
-      if (currentMinutes < sunriseMinutes) {
-        minutesIntoNight = currentMinutes + (1440 - sunsetMinutes);
+      if (currentMinutes < dayStart) {
+        minutesIntoNight = currentMinutes + (1440 - dayEnd);
       } else {
-        minutesIntoNight = currentMinutes - sunsetMinutes;
+        minutesIntoNight = currentMinutes - dayEnd;
       }
-      const runesPassed = minutesIntoNight / nightRuneDuration;
-      hourRotation = 270 + (runesPassed * 15);
+      const nightProgress = minutesIntoNight / nightLength;
+      hourRotation = 270 + (nightProgress * 180);
     }
 
-    // Get zodiac sign and calculate Small Arm position
-    const zodiacSign = 'Aries'; // Always Aries
-    const dayOfMonth = now.getDate();
-    const baseAngle = 0; // Aries starts at 0 degrees (12 o'clock)
-    const progressInSign = (dayOfMonth / 30) * 30;
-    const minuteRotation = (baseAngle + progressInSign) % 360;
-
+    // Small arm (zodiac) position - fixed at Aries (0°) with slight daily progression
+    const dayOfMonth = localTime.getDate();
+    const progressInSign = (dayOfMonth / 30) * 30; // 30° movement within the sign
+    const minuteRotation = progressInSign % 360;
 
     return {
       hourRotation: hourRotation % 360,
-      minuteRotation: minuteRotation,
-      currentTime: now.toLocaleTimeString('en-US', {
+      minuteRotation,
+      currentTime: localTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
       }),
-      zodiacSign: zodiacSign,
+      zodiacSign: 'Aries',
       timezone: `GMT${timeData.timezone.gmtOffset >= 0 ? '+' : ''}${timeData.timezone.gmtOffset / 3600}`
     };
   } catch (error) {
     console.error('Error in calculateRuneTime:', error);
-    // Return default values if everything fails
+    // Return default values in case of error
     return {
       hourRotation: 0,
       minuteRotation: 0,

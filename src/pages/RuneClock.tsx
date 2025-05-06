@@ -97,12 +97,33 @@ const RuneClock: React.FC = () => {
     };
 
     updateRuneClock();
-    intervalId = setInterval(updateRuneClock, 60000);
+    // Update every 30 seconds for more accurate time display
+    intervalId = setInterval(updateRuneClock, 30000);
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
   }, [location_]);
+
+  // Additional effect to update when search input changes
+  useEffect(() => {
+    if (searchInput) {
+      const updateForNewLocation = async () => {
+        try {
+          const runeData = await calculateRuneTime(searchInput);
+          setCurrentTime(runeData.currentTime);
+          setZodiacSign(runeData.zodiacSign);
+          setRotations({
+            hourRotation: runeData.hourRotation,
+            minuteRotation: runeData.minuteRotation
+          });
+        } catch (error) {
+          console.error('Error updating for new location:', error);
+        }
+      };
+      updateForNewLocation();
+    }
+  }, [searchInput]);
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
