@@ -76,7 +76,11 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const minuteRotation = (dayOfYear / daysInYear) * 360;
 
     // Format time to show only hours and minutes
-    const formattedTime = localTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    const formattedTime = localTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
 
 
     return {
