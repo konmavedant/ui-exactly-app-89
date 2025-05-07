@@ -18,13 +18,13 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const hours = localTime.getHours();
     const minutes = localTime.getMinutes();
 
+    // Small arm (minute hand) always points to Aries at 60°
+    const minuteRotation = 60;
+
     // Big arm (hour hand) moves based on 24-hour clock (15 degrees per hour)
     // 360° / 24 hours = 15° per hour
     // Add minute contribution: (minutes / 60) * 15 for smooth movement
     const hourRotation = (hours * 15) + ((minutes / 60) * 15);
-
-    // Small arm always points to Aries at 60°
-    const minuteRotation = 60;
 
     // Format time for display
     const timeString = localTime.toLocaleTimeString('en-US', {
@@ -34,7 +34,7 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     });
 
     return {
-      hourRotation: hourRotation % 360,
+      hourRotation,
       minuteRotation,
       currentTime: timeString,
       zodiacSign: 'Aries'
