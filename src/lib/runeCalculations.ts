@@ -48,23 +48,10 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dayDuration = sunsetMinutes - sunriseMinutes;
     const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
 
-    // Calculate big arm rotation
-    let hourRotation;
-    if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
-      // Daytime period (90° to 270°)
-      const dayProgress = (currentMinutes - sunriseMinutes) / dayDuration;
-      hourRotation = 90 + (dayProgress * 180);
-    } else {
-      // Nighttime period (270° to 90°)
-      const nightMinutes = currentMinutes < sunriseMinutes 
-        ? currentMinutes + (1440 - sunsetMinutes)
-        : currentMinutes - sunsetMinutes;
-      const nightProgress = nightMinutes / nightDuration;
-      hourRotation = 270 + (nightProgress * 180);
-      if (hourRotation >= 360) hourRotation -= 360;
-    }
+    // Big arm at morning position (90 degrees)
+    const hourRotation = 90;
 
-    // Small arm (Zodiac) positioned at Aries (60 degrees)
+    // Small arm fixed at Aries (60 degrees)
     const minuteRotation = 60;
 
     // Format time for display
