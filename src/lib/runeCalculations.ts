@@ -48,8 +48,10 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dayDuration = sunsetMinutes - sunriseMinutes;
     const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
 
-    // Big arm for time (morning position)
-    const hourRotation = 60;
+    // Calculate big arm rotation based on current time
+    const totalMinutes = localTime.getHours() * 60 + localTime.getMinutes();
+    const dayProgress = totalMinutes / 1440; // 1440 = 24 hours * 60 minutes
+    const hourRotation = dayProgress * 360;
 
     // Small arm fixed at Aries position
     const minuteRotation = 90;
