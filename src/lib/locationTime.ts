@@ -12,82 +12,48 @@ interface GeoLocation {
 }
 
 export async function getLatLngFromLocation(location: string): Promise<GeoLocation> {
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'RuneClockApp/1.0'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    
-    const data = await response.json();
-
-    if (!data || data.length === 0) {
-      throw new Error("Location not found");
-    }
-
-    return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon)
-    };
-  } catch (error) {
-    console.error("Error fetching location:", error);
-    throw error;
+  const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
+  if (!OPENCAGE_API_KEY) {
+    console.error("OpenCage API key is missing. Please check your environment variables.");
+    throw new Error("OpenCage API key not found");
   }
+  
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${OPENCAGE_API_KEY}`;
+  
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const { lat, lng } = data.results[0].geometry;
+    return { lat, lng };
+  }
+  throw new Error("Location not found");
 }
 
 export async function getLocalTime(lat: number, lng: number): Promise<TimeZoneResponse> {
-  try {
-    // For Mumbai (and India), use a fixed offset of +5:30
-    const now = new Date();
-    let gmtOffset = 5.5; // Default to IST for Mumbai
-    
-    if (Math.abs(lat - 19.0760) < 2 && Math.abs(lng - 72.8777) < 2) {
-      gmtOffset = 5.5; // Mumbai coordinates
-    } else {
-      gmtOffset = Math.round(lng / 15); // Fallback for other locations
-    }
-    
-    const localTime = new Date(now.getTime() + (gmtOffset * 3600000));
-    
-    return {
-      time: localTime.toISOString(),
-      timezone: {
-        gmtOffset: gmtOffset * 3600
-      }
-    };
-  } catch (error) {
-    console.error("Error getting local time:", error);
-    throw error;
+  const TIMEZONE_API_KEY = import.meta.env.VITE_TIMEZONE_API_KEY;
+  if (!TIMEZONE_API_KEY) {
+    console.error("TimeZoneDB API key is missing. Please check your environment variables.");
+    throw new Error("TimeZoneDB API key not found");
   }
-}
 
-export async function getSunriseSunsetTimes(lat: number, lng: number, date: string): Promise<{ sunrise: Date; sunset: Date }> {
   try {
-    const url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${date}&formatted=0`;
+    const url = `https://api.timezonedb.com/v2.1/get-time-zone?key=${TIMEZONE_API_KEY}&format=json&by=position&lat=${lat}&lng=${lng}`;
+    
     const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch sunrise/sunset data');
-    }
-    
     const data = await response.json();
-    
-    if (!data.results) {
-      throw new Error('Invalid sunrise/sunset data');
+
+    if (data.status === 'OK') {
+      return {
+        time: new Date(data.formatted).toLocaleString(),
+        timezone: {
+          gmtOffset: data.gmtOffset
+        }
+      };
     }
-    
-    return {
-      sunrise: new Date(data.results.sunrise),
-      sunset: new Date(data.results.sunset)
-    };
+    throw new Error("Time data not available");
   } catch (error) {
-    console.error("Error fetching sunrise/sunset times:", error);
+    console.error("Error fetching time:", error);
     throw error;
   }
 }

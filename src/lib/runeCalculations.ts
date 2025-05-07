@@ -1,150 +1,93 @@
-import { getSunriseSunsetTimes, getLatLngFromLocation, getLocalTime } from './locationTime';
+import { getSunrise, getSunset } from 'sunrise-sunset-js';
+import { getLatLngFromLocation } from './locationTime';
 
 interface RuneTimeInfluence {
   hourRotation: number;
   minuteRotation: number;
+}
+
+interface LocationTime {
   currentTime: string;
   zodiacSign: string;
   timezone: string;
 }
 
-const VEDIC_ZODIAC_SIGNS = [
-  'Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer',
-  'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'
-];
+function getZodiacSign(lat: number, lng: number, date: Date): string {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
 
-const VEDIC_DATES = {
-  'Aries': { start: '14-04', end: '15-05' },
-  'Taurus': { start: '15-05', end: '14-06' },
-  'Gemini': { start: '14-06', end: '15-07' },
-  'Cancer': { start: '15-07', end: '15-08' },
-  'Leo': { start: '15-08', end: '15-09' },
-  'Virgo': { start: '15-09', end: '15-10' },
-  'Libra': { start: '15-10', end: '14-11' },
-  'Scorpio': { start: '14-11', end: '14-12' },
-  'Sagittarius': { start: '14-12', end: '14-01' },
-  'Capricorn': { start: '14-01', end: '12-02' },
-  'Aquarius': { start: '12-02', end: '14-03' },
-  'Pisces': { start: '14-03', end: '14-04' }
-};
-
-function calculateBigArmRotation(
-  currentTime: Date,
-  sunrise: Date,
-  sunset: Date
-): number {
-  const current = currentTime.getTime();
-  const sunriseTime = sunrise.getTime();
-  const sunsetTime = sunset.getTime();
-
-  // Check if it's day or night
-  const isDaytime = current >= sunriseTime && current <= sunsetTime;
-
-  if (isDaytime) {
-    // During day: map time between sunrise (90°) and sunset (270°)
-    const dayProgress = (current - sunriseTime) / (sunsetTime - sunriseTime);
-    return 90 + (dayProgress * 180); // 180° spread across day period
-  } else {
-    // During night: map time between sunset (270°) and next sunrise (90°)
-    let nightProgress;
-    if (current > sunsetTime) {
-      // After sunset but before midnight
-      const nextSunrise = new Date(sunrise);
-      nextSunrise.setDate(nextSunrise.getDate() + 1);
-      nightProgress = (current - sunsetTime) / (nextSunrise.getTime() - sunsetTime);
-    } else {
-      // After midnight but before sunrise
-      nightProgress = (current - (sunset.getTime() - 24 * 60 * 60 * 1000)) / 
-                     (sunrise.getTime() - (sunset.getTime() - 24 * 60 * 60 * 1000));
-    }
-    // Map night progress from 270° to 90° (through 360/0)
-    return nightProgress <= 0.5 ? 
-           270 + (nightProgress * 2 * 180) : // First half of night
-           (nightProgress - 0.5) * 2 * 180;  // Second half of night
-  }
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+  return 'Pisces';
 }
 
-async function getVedicZodiacSign(date: Date): Promise<{ sign: string, entryDate: string }> {
+export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence & LocationTime> {
   try {
-    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    for (const [sign, dates] of Object.entries(VEDIC_DATES)) {
-      const year = date.getFullYear();
-      const startDate = new Date(`${year}-${dates.start}`);
-      const endDate = new Date(`${year}-${dates.end}`);
-      if (date >= startDate && date < endDate) {
-        return {
-          sign,
-          entryDate: startDate.toISOString()
-        };
-      }
-    }
-    return {
-      sign: 'Aries',
-      entryDate: new Date(`${date.getFullYear()}-04-14`).toISOString()
-    };
-  } catch (error) {
-    console.error('Error determining Vedic zodiac:', error);
-    return {
-      sign: 'Aries',
-      entryDate: new Date(`${date.getFullYear()}-04-14`).toISOString()
-    };
-  }
-}
-
-export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
-  try {
-    // Get coordinates and local time
     const { lat, lng } = await getLatLngFromLocation(location);
-    const timeData = await getLocalTime(lat, lng);
-    const localTime = new Date(timeData.time);
+    const now = new Date();
 
-    // Get sunrise/sunset times
-    const dateStr = localTime.toISOString().split('T')[0];
-    const sunData = await getSunriseSunsetTimes(lat, lng, dateStr);
+    // Get actual sunrise and sunset times
+    const sunrise = getSunrise(lat, lng, now);
+    const sunset = getSunset(lat, lng, now);
 
-    if (!sunData?.sunrise || !sunData?.sunset) {
-      throw new Error('Failed to get sunrise/sunset times');
+    // Convert to local time
+    const localTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
+
+    // Calculate current minutes since midnight
+    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
+    const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
+    const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
+
+    // Calculate day and night periods
+    const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
+    const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+
+    // Calculate Big Arm (Hour) rotation
+    let hourRotation;
+    if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
+      // Day period (90° to 270°)
+      const minutesSinceSunrise = currentMinutes - sunriseMinutes;
+      const dayProgress = minutesSinceSunrise / dayLengthMinutes;
+      hourRotation = 90 + (dayProgress * 180);
+    } else {
+      // Night period (270° to 90°)
+      let minutesSinceSunset;
+      if (currentMinutes < sunriseMinutes) {
+        minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+      } else {
+        minutesSinceSunset = currentMinutes - sunsetMinutes;
+      }
+      const nightProgress = minutesSinceSunset / nightLengthMinutes;
+      hourRotation = 270 + (nightProgress * 180);
     }
 
-    // Calculate rotations
-    const hourRotation = calculateBigArmRotation(
-      localTime,
-      sunData.sunrise,
-      sunData.sunset
-    );
+    // Calculate Small Arm (zodiac) rotation based on current date
+    const daysInYear = 365;
+    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+    const minuteRotation = (dayOfYear / daysInYear) * 360;
 
-    // Small arm (minute hand) stays fixed at Aries (90 degrees)
-    const minuteRotation = 90;
+    // Format time to show only hours and minutes
+    const formattedTime = localTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
-    // Format time string properly
-    const timeString = localTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: 'UTC'
-    });
-
-    // Add timezone offset to displayed time
-    const offsetHours = timeData.timezone?.gmtOffset / 3600;
-    const adjustedTime = new Date(localTime.getTime() + (offsetHours * 3600000));
-    const displayTime = adjustedTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-
-    // Get zodiac sign
-    const zodiacInfo = await getVedicZodiacSign(localTime);
 
     return {
-      hourRotation,
-      minuteRotation: 90, // Fixed at Aries position (90 degrees)
-      currentTime: displayTime,
-      zodiacSign: zodiacInfo.sign,
-      timezone: `GMT${timeData.timezone?.gmtOffset >= 0 ? '+' : ''}${Math.floor(timeData.timezone?.gmtOffset / 3600)}`
+      hourRotation: hourRotation % 360,
+      minuteRotation: minuteRotation % 360,
+      currentTime: formattedTime,
+      zodiacSign: getZodiacSign(lat, lng, now),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
   } catch (error) {
-    console.error('Error in calculateRuneTime:', error);
+    console.error('Error calculating rune time:', error);
     throw error;
   }
 }

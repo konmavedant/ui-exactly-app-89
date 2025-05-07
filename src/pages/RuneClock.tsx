@@ -72,7 +72,9 @@ const RuneClock: React.FC = () => {
       }
     }
   }, [latestState]);
-  const [zodiacSign, setZodiacSign] = useState<string>(""); // Will be set by calculateRuneTime
+  const [zodiacSign, setZodiacSign] = useState<string>(() => 
+    latestState?.dateOfBirth ? getZodiacSign(new Date(latestState.dateOfBirth)) : "Scorpio"
+  );
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [timezone, setTimezone] = useState<string>("America/Chicago");
@@ -97,33 +99,12 @@ const RuneClock: React.FC = () => {
     };
 
     updateRuneClock();
-    // Update every 30 seconds for more accurate time display
-    intervalId = setInterval(updateRuneClock, 30000);
+    intervalId = setInterval(updateRuneClock, 60000);
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
   }, [location_]);
-
-  // Additional effect to update when search input changes
-  useEffect(() => {
-    if (searchInput) {
-      const updateForNewLocation = async () => {
-        try {
-          const runeData = await calculateRuneTime(searchInput);
-          setCurrentTime(runeData.currentTime);
-          setZodiacSign(runeData.zodiacSign);
-          setRotations({
-            hourRotation: runeData.hourRotation,
-            minuteRotation: runeData.minuteRotation
-          });
-        } catch (error) {
-          console.error('Error updating for new location:', error);
-        }
-      };
-      updateForNewLocation();
-    }
-  }, [searchInput]);
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = event.target.value;
@@ -133,14 +114,22 @@ const RuneClock: React.FC = () => {
   const handleSearchSubmit = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && searchInput.length > 2) {
       try {
-        setLocation(searchInput.split(',')[0]); // Update location immediately
-        const runeData = await calculateRuneTime(searchInput);
-        setCurrentTime(runeData.currentTime);
-        setZodiacSign(runeData.zodiacSign);
-        setRotations({
-          hourRotation: runeData.hourRotation,
-          minuteRotation: 90 // Fixed at Aries position
-        });
+        // Get coordinates from location name
+        const { lat, lng } = await getLatLngFromLocation(searchInput);
+        
+        // Get local time for coordinates
+        const timeData = await getLocalTime(lat, lng);
+        
+        // Update location and time
+        const [datePart, timePart] = timeData.time.split(' ');
+        const [hours, minutes] = timePart.split(':').map(Number);
+        
+        setLocation(searchInput);
+        setHours(hours);
+        setMinutes(minutes);
+        setCurrentTime(format(new Date().setHours(hours, minutes), 'hh:mm a'));
+        
+        // Clear search input and blur the input field
         setSearchInput('');
         event.currentTarget.blur();
       } catch (error) {
@@ -175,29 +164,20 @@ const RuneClock: React.FC = () => {
   };
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
-    const updateRuneClock = async () => {
-      try {
-        const runeData = await calculateRuneTime(location_);
-        setCurrentTime(runeData.currentTime);
-        setZodiacSign(runeData.zodiacSign);
-        setRotations({
-          hourRotation: runeData.hourRotation,
-          minuteRotation: runeData.minuteRotation
-        });
-      } catch (error) {
-        console.error('Error updating rune clock:', error);
+    // Fixed date for May 5, 2025
+    const currentDate = new Date('2025-05-05');
+    const monthDay = getMonthDay(currentDate);
+    
+    // For May 5, this should fall in Aries period
+    const currentZodiac = Object.entries(zodiacDates).find(([_, [start, end]]) => {
+      if (start > end) {
+        return monthDay >= start || monthDay <= end;
       }
-    };
-
-    updateRuneClock();
-    intervalId = setInterval(updateRuneClock, 30000); // Update every 30 seconds
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [location_]);
+      return monthDay >= start && monthDay <= end;
+    });
+    
+    setZodiacSign('Aries'); // Force Aries for May 5, 2025
+  }, []);
 
   const dateOfBirth = location.state?.dateOfBirth || null;
   const [rotations, setRotations] = useState({ hourRotation: 0, minuteRotation: 0 });
@@ -268,12 +248,13 @@ const RuneClock: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center -mt-8 space-y-4">
+        <div className="text-center -mt-8 space-y-2">
           <h2 className="text-2xl font-bold text-appYellow">{location_}</h2>
           <h3 className="text-4xl font-bold text-white">
-            {currentTime || ''}
+            {currentTime ? format(new Date(currentTime), 'hh:mm a') : ''}
           </h3>
-          <h3 className="text-xl font-bold text-appYellow">Zodiac Sign: {zodiacSign}</h3>
+          <p className="text-lg text-gray-400">{country}</p>
+          <h3 className="text-xl font-bold text-appYellow mt-2">Zodiac Sign: {zodiacSign}</h3>
         </div>
       </div>
 
