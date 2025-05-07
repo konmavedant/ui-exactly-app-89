@@ -64,8 +64,8 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       if (hourRotation >= 360) hourRotation -= 360;
     }
 
-    // Small arm (Zodiac) is fixed at Aries (90 degrees)
-    const minuteRotation = 90;
+    // Small arm (Zodiac) positioned at Aries (60 degrees)
+    const minuteRotation = 60;
 
     // Format time for display
     const timeString = localTime.toLocaleTimeString('en-US', {
