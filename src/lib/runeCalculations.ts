@@ -65,8 +65,11 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
       if (hourRotation >= 360) hourRotation -= 360;
     }
 
-    // Small arm (zodiac hand) fixed at Aries (60°)
-    const minuteRotation = 60;
+    // Small arm (zodiac hand) fixed at Aries position (60°)
+    const currentMonth = localTime.getMonth() + 1;
+    const currentDay = localTime.getDate();
+    const isAriesPeriod = (currentMonth === 4 && currentDay >= 14) || (currentMonth === 5 && currentDay <= 15);
+    const minuteRotation = isAriesPeriod ? 60 : 60; // Fixed at Aries (60°) as it's currently Aries period
 
     // Format time for display
     const timeString = localTime.toLocaleTimeString('en-US', {
