@@ -44,32 +44,18 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
     const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
 
-    // Calculate day and night durations
-    const dayDuration = sunsetMinutes - sunriseMinutes;
-    const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
 
-    // Calculate big arm (hour hand) rotation based on current time position in day/night cycle
-    const totalMinutes = localTime.getHours() * 60 + localTime.getMinutes();
-    let hourRotation;
-    if (totalMinutes >= sunriseMinutes && totalMinutes <= sunsetMinutes) {
-      // Day period (90° to 270°)
-      const dayProgress = (totalMinutes - sunriseMinutes) / dayDuration;
-      hourRotation = 90 + (dayProgress * 180);
-    } else {
-      // Night period (270° to 90°)
-      const nightMinutes = totalMinutes < sunriseMinutes 
-        ? totalMinutes + (1440 - sunsetMinutes)
-        : totalMinutes - sunsetMinutes;
-      const nightProgress = nightMinutes / nightDuration;
-      hourRotation = 270 + (nightProgress * 180);
-      if (hourRotation >= 360) hourRotation -= 360;
-    }
+    // Big arm moves through 24 runes (15 degrees per hour)
+    const hours = localTime.getHours();
+    const minutes = localTime.getMinutes();
+    const hourRotation = (hours * 15) + (minutes / 4); // 360° / 24 = 15° per hour
 
-    // Small arm (zodiac hand) fixed at Aries position (60°)
+    // Small arm points to Aries until May 15th
     const currentMonth = localTime.getMonth() + 1;
     const currentDay = localTime.getDate();
     const isAriesPeriod = (currentMonth === 4 && currentDay >= 14) || (currentMonth === 5 && currentDay <= 15);
-    const minuteRotation = isAriesPeriod ? 60 : 60; // Fixed at Aries (60°) as it's currently Aries period
+    const minuteRotation = isAriesPeriod ? 60 : ((hours % 12) * 30 + minutes / 2); // Default to normal clock movement if not Aries period
+
 
     // Format time for display
     const timeString = localTime.toLocaleTimeString('en-US', {
