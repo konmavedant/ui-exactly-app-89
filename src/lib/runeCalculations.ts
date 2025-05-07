@@ -8,6 +8,43 @@ interface RuneTimeInfluence {
   zodiacSign: string;
 }
 
+export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
+  try {
+    const { lat, lng } = await getLatLngFromLocation(location);
+    const timeData = await getLocalTime(lat, lng);
+    const localTime = new Date(timeData.time);
+
+    // Get hours and minutes from the local time
+    const hours = localTime.getHours();
+    const minutes = localTime.getMinutes();
+
+    // Big arm (hour hand) moves based on 24-hour clock (15 degrees per hour)
+    // 360° / 24 hours = 15° per hour
+    // Add minute contribution: (minutes / 60) * 15 for smooth movement
+    const hourRotation = (hours * 15) + ((minutes / 60) * 15);
+
+    // Small arm always points to Aries at 60°
+    const minuteRotation = 60;
+
+    // Format time for display
+    const timeString = localTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    return {
+      hourRotation: hourRotation % 360,
+      minuteRotation,
+      currentTime: timeString,
+      zodiacSign: 'Aries'
+    };
+  } catch (error) {
+    console.error('Error calculating rune time:', error);
+    throw error;
+  }
+}
+
 function getZodiacSign(date: Date): string {
   const month = date.getMonth() + 1;
   const day = date.getDate();
@@ -27,51 +64,4 @@ function getZodiacSign(date: Date): string {
   if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
   if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
   return 'Pisces';
-}
-
-export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
-  try {
-    const { lat, lng } = await getLatLngFromLocation(location);
-    const timeData = await getLocalTime(lat, lng);
-    const localTime = new Date(timeData.time);
-
-    // Get sunrise and sunset times for the current date
-    const sunrise = getSunrise(lat, lng);
-    const sunset = getSunset(lat, lng);
-
-    // Convert times to minutes since midnight
-    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
-    const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
-    const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
-
-
-    // Big arm moves through 24 runes (15 degrees per hour)
-    const hours = localTime.getHours();
-    const minutes = localTime.getMinutes();
-    const hourRotation = (hours * 15) + (minutes / 4); // 360° / 24 = 15° per hour
-
-    // Small arm points to Aries until May 15th
-    const currentMonth = localTime.getMonth() + 1;
-    const currentDay = localTime.getDate();
-    const isAriesPeriod = (currentMonth === 4 && currentDay >= 14) || (currentMonth === 5 && currentDay <= 15);
-    const minuteRotation = isAriesPeriod ? 60 : ((hours % 12) * 30 + minutes / 2); // Default to normal clock movement if not Aries period
-
-
-    // Format time for display
-    const timeString = localTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-
-    return {
-      hourRotation: hourRotation % 360,
-      minuteRotation,
-      currentTime: timeString,
-      zodiacSign: getZodiacSign(localTime)
-    };
-  } catch (error) {
-    console.error('Error calculating rune time:', error);
-    throw error;
-  }
 }
