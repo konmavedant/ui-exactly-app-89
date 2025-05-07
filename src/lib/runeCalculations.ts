@@ -1,18 +1,16 @@
+
 import { getSunrise, getSunset } from 'sunrise-sunset-js';
 import { getLatLngFromLocation } from './locationTime';
 
 interface RuneTimeInfluence {
   hourRotation: number;
   minuteRotation: number;
-}
-
-interface LocationTime {
   currentTime: string;
   zodiacSign: string;
   timezone: string;
 }
 
-function getZodiacSign(lat: number, lng: number, date: Date): string {
+function getZodiacSign(date: Date): string {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -30,64 +28,69 @@ function getZodiacSign(lat: number, lng: number, date: Date): string {
   return 'Pisces';
 }
 
-export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence & LocationTime> {
+export async function calculateRuneTime(location: string): Promise<RuneTimeInfluence> {
   try {
     const { lat, lng } = await getLatLngFromLocation(location);
     const now = new Date();
-
-    // Get actual sunrise and sunset times
+    
+    // Get sunrise and sunset times for the current date
     const sunrise = getSunrise(lat, lng, now);
     const sunset = getSunset(lat, lng, now);
 
-    // Convert to local time
-    const localTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
-
-    // Calculate current minutes since midnight
-    const currentMinutes = localTime.getHours() * 60 + localTime.getMinutes();
+    // Convert current time to minutes since midnight
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    // Convert sunrise and sunset to minutes since midnight
     const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
     const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
 
-    // Calculate day and night periods
-    const dayLengthMinutes = sunsetMinutes - sunriseMinutes;
-    const nightLengthMinutes = (1440 - sunsetMinutes) + sunriseMinutes;
+    // Calculate day and night durations
+    const dayDuration = sunsetMinutes - sunriseMinutes;
+    const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
+    
+    // Each rune represents 1/12 of day or night
+    const dayRuneDuration = dayDuration / 12;
+    const nightRuneDuration = nightDuration / 12;
 
-    // Calculate Big Arm (Hour) rotation
-    let hourRotation;
+    // Calculate Big Arm rotation
+    let hourRotation = 0;
     if (currentMinutes >= sunriseMinutes && currentMinutes <= sunsetMinutes) {
-      // Day period (90° to 270°)
-      const minutesSinceSunrise = currentMinutes - sunriseMinutes;
-      const dayProgress = minutesSinceSunrise / dayLengthMinutes;
+      // Day time - lower half of clock (90° to 270°)
+      const minutesIntoDaylight = currentMinutes - sunriseMinutes;
+      const dayProgress = minutesIntoDaylight / dayDuration;
       hourRotation = 90 + (dayProgress * 180);
     } else {
-      // Night period (270° to 90°)
-      let minutesSinceSunset;
+      // Night time - upper half of clock (270° to 90°)
+      let minutesIntoNight;
       if (currentMinutes < sunriseMinutes) {
-        minutesSinceSunset = currentMinutes + (1440 - sunsetMinutes);
+        minutesIntoNight = currentMinutes + (1440 - sunsetMinutes);
       } else {
-        minutesSinceSunset = currentMinutes - sunsetMinutes;
+        minutesIntoNight = currentMinutes - sunsetMinutes;
       }
-      const nightProgress = minutesSinceSunset / nightLengthMinutes;
+      const nightProgress = minutesIntoNight / nightDuration;
       hourRotation = 270 + (nightProgress * 180);
     }
 
-    // Calculate Small Arm (zodiac) rotation based on current date
-    const daysInYear = 365;
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-    const minuteRotation = (dayOfYear / daysInYear) * 360;
+    // Calculate Small Arm (zodiac) rotation
+    // One complete rotation per year (365 days)
+    const startOfYear = new Date(now.getFullYear(), 0, 0);
+    const diff = now.getTime() - startOfYear.getTime();
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const yearProgress = dayOfYear / 365;
+    const minuteRotation = yearProgress * 360;
 
-    // Format time to show only hours and minutes
-    const formattedTime = localTime.toLocaleTimeString('en-US', {
+    // Format time for display
+    const timeString = now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
     });
 
-
     return {
       hourRotation: hourRotation % 360,
       minuteRotation: minuteRotation % 360,
-      currentTime: formattedTime,
-      zodiacSign: getZodiacSign(lat, lng, now),
+      currentTime: timeString,
+      zodiacSign: getZodiacSign(now),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
   } catch (error) {
