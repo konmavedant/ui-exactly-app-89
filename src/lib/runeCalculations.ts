@@ -48,11 +48,11 @@ export async function calculateRuneTime(location: string): Promise<RuneTimeInflu
     const dayDuration = sunsetMinutes - sunriseMinutes;
     const nightDuration = 1440 - dayDuration; // 1440 = 24 hours * 60 minutes
 
-    // Big arm at morning position (90 degrees)
-    const hourRotation = 90;
+    // Big arm for time (morning position)
+    const hourRotation = 60;
 
-    // Small arm fixed at Aries (60 degrees)
-    const minuteRotation = 60;
+    // Small arm fixed at Aries position
+    const minuteRotation = 90;
 
     // Format time for display
     const timeString = localTime.toLocaleTimeString('en-US', {
