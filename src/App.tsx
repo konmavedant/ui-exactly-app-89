@@ -21,10 +21,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/rune-clock" element={<RuneClock />} />
+          <Route path="/" element={<RuneClock />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/app-info" element={<AppInfo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
